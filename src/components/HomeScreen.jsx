@@ -7,7 +7,7 @@ export default function HomeScreen({ onNavigate }) {
       position: 'relative',
       width: '100%',
       height: '100%',
-      minHeight: '100%',
+      maxHeight: '100%',
       display: 'flex',
       flexDirection: 'column',
       background: '#070D1E',

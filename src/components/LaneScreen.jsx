@@ -387,7 +387,7 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
       style={{
         position: 'relative',
         height: '100%',
-        minHeight: '100%',
+        maxHeight: '100%',
         width: '100%',
         maxWidth: '100%',
         boxSizing: 'border-box',
@@ -395,11 +395,11 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        padding: '14px 12px 14px',
+        padding: '8px 10px 8px',
         backgroundImage: "url('/assets/prague_bg.jpg')",
         backgroundSize: 'cover',
         backgroundPosition: 'center top',
-        gap: 8
+        gap: 5
       }}
     >
       {/* Sky Darken Gradient for Top Bar & Medals Readability */}
@@ -522,17 +522,17 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
                 background: isSelected ? tier.bgGradient : 'rgba(10, 16, 38, 0.86)',
                 backdropFilter: 'blur(14px)',
                 border: isSelected ? `2px solid ${tier.accentBorder}` : `1px solid ${tier.inactiveBorder}`,
-                borderRadius: 14,
-                padding: '10px 4px 10px',
+                borderRadius: 13,
+                padding: '6px 3px 6px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 textAlign: 'center',
                 cursor: 'pointer',
-                transform: isSelected ? 'translateY(-4px)' : 'translateY(0)',
+                transform: isSelected ? 'translateY(-3px)' : 'translateY(0)',
                 boxShadow: isSelected
-                  ? `0 0 22px ${tier.glowColor}, 0 8px 18px rgba(0,0,0,0.55)`
-                  : '0 5px 14px rgba(0,0,0,0.45)',
+                  ? `0 0 20px ${tier.glowColor}, 0 6px 16px rgba(0,0,0,0.55)`
+                  : '0 4px 12px rgba(0,0,0,0.45)',
                 animation: isSelected ? 'goldCardHalo 2.5s ease-in-out infinite' : 'none',
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                 userSelect: 'none'
@@ -542,8 +542,8 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
               {isSelected && (
                 <div style={{
                   position: 'absolute',
-                  top: -14,
-                  fontSize: 15,
+                  top: -13,
+                  fontSize: 14,
                   animation: 'crownFloat 2s ease-in-out infinite',
                   pointerEvents: 'none',
                   zIndex: 3
@@ -555,11 +555,11 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
 
               {/* Tier Label */}
               <span style={{
-                fontSize: 10.5,
+                fontSize: 9.5,
                 fontWeight: 900,
                 color: isSelected ? tier.color : '#CBD5E1',
                 letterSpacing: '0.06em',
-                marginTop: 4,
+                marginTop: 2,
                 transition: 'color 0.2s ease'
               }}>
                 {tier.name}
@@ -568,11 +568,11 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
               {/* Target Value with Animated Count */}
               <div style={{
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
-                fontSize: isSelected ? 18.5 : 17,
+                fontSize: isSelected ? 16.5 : 15,
                 fontWeight: 900,
                 color: '#FFFFFF',
                 lineHeight: 1.15,
-                marginTop: 3,
+                marginTop: 2,
                 textShadow: isSelected ? `0 0 12px ${tier.glowColor}` : 'none',
                 transition: 'all 0.2s ease'
               }}>
@@ -584,30 +584,30 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
       </div>
 
       {/* ============================================================== */}
-      {/* 3. SELECTED ROLE & TIER REWARD STATUS BANNER (Enlarged & Clear) */}
+      {/* 3. SELECTED ROLE & TIER REWARD STATUS BANNER */}
       {/* ============================================================== */}
       <div style={{
         background: 'linear-gradient(135deg, rgba(14, 26, 68, 0.96) 0%, rgba(8, 14, 40, 0.98) 100%)',
         border: '1.5px solid rgba(233, 185, 73, 0.6)',
-        borderRadius: 20,
-        padding: '16px 18px 14px',
+        borderRadius: 16,
+        padding: '8px 12px 7px',
         display: 'flex',
         flexDirection: 'column',
-        gap: 12,
+        gap: 6,
         zIndex: 2,
         flexShrink: 0,
-        boxShadow: '0 12px 32px rgba(0,0,0,0.6), 0 0 20px rgba(233, 185, 73, 0.25)'
+        boxShadow: '0 8px 24px rgba(0,0,0,0.55), 0 0 16px rgba(233, 185, 73, 0.2)'
       }}>
         {/* Top Row: Selected Role & Target Threshold */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
           {/* Left: Role Title */}
-          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, paddingRight: 8 }}>
-            <span style={{ fontSize: 10, fontWeight: 900, color: '#F59E0B', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, paddingRight: 6 }}>
+            <span style={{ fontSize: 9, fontWeight: 900, color: '#F59E0B', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               SELECTED ROLE
             </span>
             <span style={{
               fontFamily: "'Plus Jakarta Sans', sans-serif",
-              fontSize: 16.5,
+              fontSize: 14.5,
               fontWeight: 800,
               color: '#FFFFFF',
               whiteSpace: 'nowrap'
@@ -620,12 +620,12 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
             <span style={{
               fontFamily: "'Plus Jakarta Sans', sans-serif",
-              fontSize: 11,
+              fontSize: 9.5,
               fontWeight: 800,
               color: '#CBD5E1',
               letterSpacing: '0.06em',
               textTransform: 'uppercase',
-              marginBottom: 3
+              marginBottom: 2
             }}>
               {selectedTierIndex === 2 ? 'PRAGUE THRESHOLD' : `${TIER_CONFIGS[selectedTierIndex].cleanName} TARGET`}
             </span>
@@ -633,11 +633,11 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
               background: 'linear-gradient(135deg, #FFE28A, #FDE68A)',
               color: '#0B1430',
               fontFamily: "'Plus Jakarta Sans', sans-serif",
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: 900,
-              padding: '5px 14px',
-              borderRadius: 10,
-              boxShadow: '0 3px 10px rgba(0,0,0,0.35)'
+              padding: '3px 10px',
+              borderRadius: 8,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.35)'
             }}>
               <AnimatedCount value={targets[selectedTierIndex]} prefix="₹" suffix=" Lakh" />
             </div>
@@ -647,8 +647,8 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
         {/* Bottom Row: Selected Medal Tier Reward - Simple Clean Line */}
         <div style={{
           borderTop: '1px solid rgba(255, 255, 255, 0.16)',
-          paddingTop: 10,
-          marginTop: 2,
+          paddingTop: 6,
+          marginTop: 1,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -656,7 +656,7 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
         }}>
           <span style={{
             fontFamily: "'Plus Jakarta Sans', sans-serif",
-            fontSize: 14.5,
+            fontSize: 13,
             fontWeight: 800,
             color: TIER_CONFIGS[selectedTierIndex].color,
             letterSpacing: '0.02em',
@@ -668,39 +668,39 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
       </div>
 
       {/* ============================================================== */}
-      {/* 4. FROSTED WHITE CARD: 10 ROLE CHIPS MATRIX (Expanded & Filled) */}
+      {/* 4. FROSTED WHITE CARD: 10 ROLE CHIPS MATRIX */}
       {/* ============================================================== */}
       <div style={{
         background: 'rgba(255, 255, 255, 0.95)',
         backdropFilter: 'blur(18px)',
         border: '1.5px solid rgba(255, 255, 255, 0.9)',
-        borderRadius: 22,
-        padding: '13px 13px 11px',
-        boxShadow: '0 12px 36px rgba(0, 0, 0, 0.45)',
+        borderRadius: 16,
+        padding: '7px 9px 6px',
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)',
         display: 'flex',
         flexDirection: 'column',
-        gap: 8,
+        gap: 5,
         zIndex: 2,
         flexShrink: 0
       }}>
-        {/* Header inside White Card - Clean, no Platinum Target */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '0 2px' }}>
+        {/* Header inside White Card */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0 2px' }}>
           <div style={{
-            width: 20,
-            height: 20,
-            borderRadius: 10,
+            width: 16,
+            height: 16,
+            borderRadius: 8,
             background: '#EF4444',
             border: '2px solid #FFFFFF',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 1px 5px rgba(0,0,0,0.25)'
+            boxShadow: '0 1px 4px rgba(0,0,0,0.25)'
           }}>
-            <div style={{ width: 6, height: 6, borderRadius: 3, background: '#FFFFFF' }} />
+            <div style={{ width: 5, height: 5, borderRadius: 2.5, background: '#FFFFFF' }} />
           </div>
           <span style={{
             fontFamily: "'Plus Jakarta Sans', sans-serif",
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: 900,
             letterSpacing: '0.04em',
             color: '#0F172A',
@@ -710,11 +710,11 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
           </span>
         </div>
 
-        {/* 10 Role Buttons (2 Columns × 5 Rows) - Text only, no lacs, centered and clean */}
+        {/* 10 Role Buttons (2 Columns × 5 Rows) */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: 7,
+          gap: 4.5,
           width: '100%',
           boxSizing: 'border-box'
         }}>
@@ -727,31 +727,31 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
                 type="button"
                 onClick={() => handleSelect(index)}
                 style={{
-                  height: 46,
-                  borderRadius: 12,
-                  border: isSelected ? '2px solid #E9B949' : '1px solid #DCE6F5',
+                  height: 33,
+                  borderRadius: 9,
+                  border: isSelected ? '1.5px solid #E9B949' : '1px solid #DCE6F5',
                   background: isSelected
                     ? 'linear-gradient(135deg, #0B1536 0%, #15224D 100%)'
                     : 'linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%)',
                   color: isSelected ? '#FFFFFF' : '#0F172A',
-                  padding: '0 10px',
+                  padding: '0 6px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   textAlign: 'center',
                   cursor: 'pointer',
                   boxShadow: isSelected
-                    ? '0 0 16px rgba(233, 185, 73, 0.45), 0 4px 10px rgba(0,0,0,0.3)'
-                    : '0 2px 6px rgba(15, 23, 42, 0.05)',
-                  transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                    ? '0 0 12px rgba(233, 185, 73, 0.4), 0 3px 8px rgba(0,0,0,0.25)'
+                    : '0 1px 4px rgba(15, 23, 42, 0.05)',
+                  transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
                   position: 'relative',
                   overflow: 'hidden'
                 }}
               >
-                {/* Role Label - Text only, clean and centered */}
+                {/* Role Label */}
                 <span style={{
                   fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  fontSize: 13,
+                  fontSize: 11.5,
                   fontWeight: isSelected ? 800 : 700,
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
@@ -769,28 +769,28 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
         {/* Informative Rule Footnote */}
         <div style={{
           background: '#DBEAFE',
-          borderRadius: 9,
-          padding: '5px 10px',
+          borderRadius: 7,
+          padding: '3px 8px',
           display: 'flex',
           alignItems: 'center',
-          gap: 7
+          gap: 6
         }}>
           <div style={{
-            width: 15,
-            height: 15,
-            borderRadius: 7.5,
+            width: 13,
+            height: 13,
+            borderRadius: 6.5,
             background: '#2563EB',
             color: '#FFFFFF',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 9.5,
+            fontSize: 8.5,
             fontWeight: 900,
             flexShrink: 0
           }}>
             i
           </div>
-          <span style={{ fontSize: 10, color: '#1E40AF', fontWeight: 600, lineHeight: 1.3 }}>
+          <span style={{ fontSize: 9, color: '#1E40AF', fontWeight: 600, lineHeight: 1.25 }}>
             Kharghar, Vasai, Panjim count as Urban. Rural BMs qualify via self-sourcing.
           </span>
         </div>
@@ -803,8 +803,7 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
         position: 'relative',
         width: '100%',
         zIndex: 2,
-        flexShrink: 0,
-        marginBottom: 2
+        flexShrink: 0
       }}>
         <button
           type="button"
@@ -816,22 +815,22 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
           style={{
             position: 'relative',
             width: '100%',
-            height: 52,
-            borderRadius: 26,
+            height: 48,
+            borderRadius: 24,
             border: '1.5px solid #FFF0B8',
             background: 'linear-gradient(135deg, #FFE28A 0%, #F5B838 50%, #E29B12 100%)',
             color: '#1A1202',
             fontFamily: "'Plus Jakarta Sans', sans-serif",
-            fontSize: 15,
+            fontSize: 14.5,
             fontWeight: 900,
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 9,
+            gap: 8,
             cursor: 'pointer',
-            boxShadow: '0 8px 26px rgba(245, 184, 56, 0.6), 0 3px 8px rgba(0,0,0,0.4)',
+            boxShadow: '0 6px 20px rgba(245, 184, 56, 0.55), 0 2px 6px rgba(0,0,0,0.35)',
             overflow: 'hidden',
             transition: 'transform 0.15s ease'
           }}

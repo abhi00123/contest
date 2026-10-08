@@ -48,16 +48,16 @@ export default function RuleQuestScreen({ onNavigate, gameMode = 1 }) {
         position: 'relative',
         width: '100%',
         height: '100%',
-        minHeight: '100%',
+        maxHeight: '100%',
         boxSizing: 'border-box',
         background: 'radial-gradient(ellipse at 50% 0%, #152248 0%, #091026 55%, #030612 100%)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        padding: '16px 18px 16px',
+        padding: '12px 14px 12px',
         overflow: 'hidden',
         userSelect: 'none',
-        gap: 14
+        gap: 10
       }}
     >
       {/* Background Ambient Stars */}

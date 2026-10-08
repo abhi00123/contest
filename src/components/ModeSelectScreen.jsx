@@ -14,13 +14,13 @@ export default function ModeSelectScreen({ onSelectMode }) {
         position: 'relative',
         width: '100%',
         height: '100%',
-        minHeight: '100%',
+        maxHeight: '100%',
         boxSizing: 'border-box',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        padding: '24px 20px',
+        padding: '18px 18px',
         background: 'radial-gradient(ellipse at 50% 15%, #1A2750 0%, #0A1228 65%, #040816 100%)',
         userSelect: 'none'
       }}
