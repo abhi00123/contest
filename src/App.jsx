@@ -19,6 +19,7 @@ export default function App() {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isVideoFadingOut, setIsVideoFadingOut] = useState(false);
   const videoRef = useRef(null);
+  const audioFadeRef = useRef(null);
 
   // Continuously suppress and purge any third-party video speed controller badges (1.00)
   useEffect(() => {
@@ -75,7 +76,12 @@ export default function App() {
     setIsVideoFadingOut(false);
 
     if (videoRef.current) {
+      if (audioFadeRef.current) {
+        cancelAnimationFrame(audioFadeRef.current);
+        audioFadeRef.current = null;
+      }
       videoRef.current.currentTime = 0;
+      videoRef.current.volume = 1; // Full initial volume
       const playPromise = videoRef.current.play();
       if (playPromise !== undefined) {
         playPromise.catch((err) => {
@@ -89,7 +95,7 @@ export default function App() {
     }
   };
 
-  // 3. Monitor video playback -> Start fade out at last 1.5 seconds
+  // 3. Monitor video playback -> Start audio & video fade out together at last 1.5 seconds
   const handleVideoTimeUpdate = () => {
     const video = videoRef.current;
     if (!video || !video.duration) return;
@@ -98,11 +104,43 @@ export default function App() {
     // Trigger smooth fade out exactly at the last 1.5s
     if (remaining <= 1.5 && !isVideoFadingOut) {
       setIsVideoFadingOut(true);
+
+      // Smooth audio volume fade out in exact sync with 1.5s visual dissolve
+      const fadeDuration = 1500; // 1.5 seconds in ms
+      const startVolume = video.volume > 0 ? video.volume : 1;
+      const startTime = performance.now();
+
+      if (audioFadeRef.current) cancelAnimationFrame(audioFadeRef.current);
+
+      const fadeAudio = (now) => {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / fadeDuration, 1);
+        // Smooth logarithmic/linear volume reduction
+        const newVolume = Math.max(0, startVolume * (1 - progress));
+        if (videoRef.current) {
+          videoRef.current.volume = newVolume;
+        }
+        if (progress < 1) {
+          audioFadeRef.current = requestAnimationFrame(fadeAudio);
+        } else if (videoRef.current) {
+          videoRef.current.volume = 0;
+          audioFadeRef.current = null;
+        }
+      };
+
+      audioFadeRef.current = requestAnimationFrame(fadeAudio);
     }
   };
 
   // 4. Video ends -> Fade in Second Screen (LaneScreen)
   const handleVideoEnded = () => {
+    if (audioFadeRef.current) {
+      cancelAnimationFrame(audioFadeRef.current);
+      audioFadeRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.volume = 1;
+    }
     // Purge any third-party controller overlay before screen switch
     document.querySelectorAll('.vsc-controller, .vsc-modifier, #vsc-controller, [data-vscid], [class*="vsc-"], [id*="vsc-"]').forEach(el => el.remove());
     setIsVideoPlaying(false);
@@ -129,11 +167,16 @@ export default function App() {
   // Standard Navigation
   const handleNavigate = (screen) => {
     if (screen === 'home') {
+      if (audioFadeRef.current) {
+        cancelAnimationFrame(audioFadeRef.current);
+        audioFadeRef.current = null;
+      }
       setIsVideoPlaying(false);
       setIsVideoFadingOut(false);
       if (videoRef.current) {
         videoRef.current.pause();
         videoRef.current.currentTime = 0;
+        videoRef.current.volume = 1;
       }
     }
     setCurrentScreen(screen);
