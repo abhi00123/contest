@@ -1,5 +1,71 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+// Complete list of game visual assets to preload
+const GAME_IMAGE_ASSETS = [
+  './assets/Prague Winners International Training Poster.png',
+  './assets/prague_bg.jpg',
+  './assets/Prague_Golden_Travel_Stamp.png',
+  './assets/medals/Bronze.png',
+  './assets/medals/Silver.png',
+  './assets/medals/Golden.png',
+  './assets/medals/Titanium.png',
+  './assets/medals/Platinum.png'
+];
+
+const preloadImage = (src) => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = src;
+    if (img.complete && img.naturalWidth !== 0) {
+      resolve();
+    } else {
+      img.onload = () => resolve();
+      img.onerror = () => {
+        if (src.startsWith('./')) {
+          const fallback = new Image();
+          fallback.src = src.replace(/^\.\//, '/');
+          fallback.onload = () => resolve();
+          fallback.onerror = () => resolve();
+        } else {
+          resolve();
+        }
+      };
+    }
+  });
+};
+
+const preloadVideo = (src) => {
+  return new Promise((resolve) => {
+    const video = document.createElement('video');
+    video.preload = 'auto';
+    video.muted = true;
+    video.playsInline = true;
+    video.src = src;
+
+    let finished = false;
+    const markDone = () => {
+      if (!finished) {
+        finished = true;
+        resolve();
+      }
+    };
+
+    video.addEventListener('canplaythrough', markDone, { once: true });
+    video.addEventListener('loadeddata', markDone, { once: true });
+    video.onerror = () => {
+      if (src.startsWith('./')) {
+        video.src = src.replace(/^\.\//, '/');
+        video.load();
+      } else {
+        markDone();
+      }
+    };
+
+    // Safety timeout in case of slow video buffer
+    setTimeout(markDone, 6000);
+  });
+};
+
 export default function LoaderScreen({ onLoaded }) {
   const [isFadingOut, setIsFadingOut] = useState(false);
   const animFrameRef = useRef(null);
@@ -8,38 +74,7 @@ export default function LoaderScreen({ onLoaded }) {
   useEffect(() => {
     let isMounted = true;
     const startTime = performance.now();
-    const minDisplayMs = 1200; // smooth minimum display so it doesn't flash if cached
-    let isVideoReady = false;
-
-    // 1. Preload Poster Image
-    const poster = new Image();
-    poster.src = './assets/Prague Winners International Training Poster.png';
-    poster.onerror = () => {
-      poster.src = '/assets/Prague Winners International Training Poster.png';
-    };
-
-    // 2. Preload Video
-    const video = document.createElement('video');
-    video.preload = 'auto';
-    video.muted = true;
-    video.playsInline = true;
-    video.src = './assets/clip.mp4';
-    video.onerror = () => {
-      if (!video.src.endsWith('/assets/clip.mp4')) {
-        video.src = '/assets/clip.mp4';
-      }
-    };
-
-    const handleReady = () => {
-      isVideoReady = true;
-      checkFinish();
-    };
-
-    video.addEventListener('canplaythrough', handleReady);
-    video.addEventListener('loadeddata', () => {
-      isVideoReady = true;
-      checkFinish();
-    });
+    const minDisplayMs = 1500; // smooth minimum display so spinner is seen cleanly
 
     const checkFinish = () => {
       if (!isMounted || hasFinishedRef.current) return;
@@ -59,17 +94,24 @@ export default function LoaderScreen({ onLoaded }) {
       }, remainingTime);
     };
 
-    // Guaranteed fallback after 3.5s so user never gets stuck
+    // Preload ALL game images, video, and web fonts in parallel
+    const imagePromises = GAME_IMAGE_ASSETS.map(preloadImage);
+    const videoPromise = preloadVideo('./assets/clip.mp4');
+    const fontsPromise = document.fonts ? document.fonts.ready : Promise.resolve();
+
+    Promise.all([...imagePromises, videoPromise, fontsPromise]).then(() => {
+      checkFinish();
+    });
+
+    // High safety fallback (8s) so user never gets stuck under severe network degradation
     const fallbackTimer = setTimeout(() => {
       checkFinish();
-    }, 3500);
+    }, 8000);
 
     return () => {
       isMounted = false;
       clearTimeout(fallbackTimer);
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-      video.removeEventListener('canplaythrough', handleReady);
-      video.src = '';
     };
   }, [onLoaded]);
 
@@ -129,34 +171,34 @@ export default function LoaderScreen({ onLoaded }) {
             gap: 5
           }}
         >
-          {/* Main "LOADING..." matching reference image font style */}
+          {/* Main "LOADING" (no dots on loading text) */}
           <span
             style={{
               fontFamily: "'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif",
               fontSize: '20px',
-              fontWeight: 700,
+              fontWeight: 800,
               letterSpacing: '0.18em',
               color: '#F6EFD9',
               textTransform: 'uppercase',
               textShadow: '0 2px 10px rgba(0, 0, 0, 0.6)'
             }}
           >
-            LOADING...
+            LOADING
           </span>
 
-          {/* Single Concept Word Below: "DREAMS" */}
+          {/* Concept Word with dots: "DREAMS....." */}
           <span
             style={{
               fontFamily: "'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif",
-              fontSize: '12px',
+              fontSize: '12.5px',
               fontWeight: 800,
-              letterSpacing: '0.3em',
+              letterSpacing: '0.22em',
               color: '#F5B838',
               textTransform: 'uppercase',
               textShadow: '0 0 12px rgba(245, 184, 56, 0.5)'
             }}
           >
-            DREAMS
+            DREAMS.....
           </span>
         </div>
       </div>
