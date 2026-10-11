@@ -1,24 +1,141 @@
-import React, { useState } from 'react';
-import ModeSelectScreen from './components/ModeSelectScreen';
+import React, { useState, useRef, useEffect } from 'react';
+import RoleSelectScreen from './components/RoleSelectScreen';
+import LoaderScreen from './components/LoaderScreen';
 import HomeScreen from './components/HomeScreen';
 import LaneScreen from './components/LaneScreen';
 import JourneyScreen from './components/JourneyScreen';
 import RuleQuestScreen from './components/RuleQuestScreen';
+import { sound } from './utils/sound';
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState('mode'); // 'mode', 'home', 'lane', 'journey', 'rules'
-  const [gameMode, setGameMode] = useState(1); // 1 or 2
+  // Screen sequence: 'roleSelect' -> 'loading' -> 'home' (with seamless video dissolve) -> 'lane' -> 'rules'
+  const [currentScreen, setCurrentScreen] = useState('roleSelect');
+  const [userRole, setUserRole] = useState(null); // 'frontline' or 'leadership'
+  const [gameMode, setGameMode] = useState(1); // 1: Direct Quest
   const [selectedLane, setSelectedLane] = useState(2); // BBRL Staff Urban & Metro
-  const [wap, setWap] = useState(0); // Default 0 Lakhs at starting
+  const [wap, setWap] = useState(0);
 
-  const handleSelectMode = (mode) => {
-    setGameMode(mode);
-    setCurrentScreen('home'); // Go to intro screen first
+  // Smooth Video Transition States
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [isVideoFadingOut, setIsVideoFadingOut] = useState(false);
+  const videoRef = useRef(null);
+
+  // Continuously suppress and purge any third-party video speed controller badges (1.00)
+  useEffect(() => {
+    const purgeVideoOverlays = () => {
+      // 1. Remove any known extension elements
+      const extensionBadges = document.querySelectorAll(
+        '.vsc-controller, .vsc-modifier, #vsc-controller, [data-vscid], [class*="vsc-"], [id*="vsc-"]'
+      );
+      extensionBadges.forEach((el) => el.remove());
+
+      // 2. Purge any stray element overlaying top-left with "1.00" / "1.00x"
+      const allDivs = document.querySelectorAll('div, span, p');
+      allDivs.forEach((el) => {
+        if (
+          el.id === 'root' ||
+          el.id === 'game-viewport' ||
+          el.classList.contains('phone-container') ||
+          el.classList.contains('phone-screen')
+        ) return;
+        const text = el.textContent?.trim();
+        if (text === '1.00' || text === '1.0' || text === '1.00x' || text === '1.0x') {
+          const style = window.getComputedStyle(el);
+          if (style.position === 'absolute' || style.position === 'fixed') {
+            el.remove();
+          }
+        }
+      });
+    };
+
+    purgeVideoOverlays();
+    const observer = new MutationObserver(purgeVideoOverlays);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // 0. Role Selection -> Starts loading screen
+  const handleSelectRole = (roleKey) => {
+    setUserRole(roleKey);
+    setCurrentScreen('loading');
     const el = document.getElementById('game-viewport');
     if (el) el.scrollTop = 0;
   };
 
+  // 1. Loader finishes -> Reveal Start Screen
+  const handleLoaded = () => {
+    setCurrentScreen('home');
+  };
+
+  // 2. User clicks "Start the journey" -> Seamless dissolve into video
+  const handleStartJourney = () => {
+    sound.play('click');
+    setIsVideoPlaying(true);
+    setIsVideoFadingOut(false);
+
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn('Browser restricted unmuted playback, attempting muted:', err);
+          if (videoRef.current) {
+            videoRef.current.muted = true;
+            videoRef.current.play().catch((e) => console.error('Play failed:', e));
+          }
+        });
+      }
+    }
+  };
+
+  // 3. Monitor video playback -> Start fade out at last 1.5 seconds
+  const handleVideoTimeUpdate = () => {
+    const video = videoRef.current;
+    if (!video || !video.duration) return;
+    const remaining = video.duration - video.currentTime;
+
+    // Trigger smooth fade out exactly at the last 1.5s
+    if (remaining <= 1.5 && !isVideoFadingOut) {
+      setIsVideoFadingOut(true);
+    }
+  };
+
+  // 4. Video ends -> Fade in Second Screen (LaneScreen)
+  const handleVideoEnded = () => {
+    // Purge any third-party controller overlay before screen switch
+    document.querySelectorAll('.vsc-controller, .vsc-modifier, #vsc-controller, [data-vscid], [class*="vsc-"], [id*="vsc-"]').forEach(el => el.remove());
+    setIsVideoPlaying(false);
+    setIsVideoFadingOut(false);
+    if (gameMode === 1) {
+      setCurrentScreen('lane');
+    } else {
+      setCurrentScreen('journey');
+    }
+  };
+
+  // Fallback if video relative path needs root slash
+  const handleVideoError = () => {
+    const video = videoRef.current;
+    if (video && !video.src.endsWith('/assets/clip.mp4')) {
+      video.src = '/assets/clip.mp4';
+      video.load();
+      if (isVideoPlaying) {
+        video.play().catch((e) => console.log('Video error reload:', e));
+      }
+    }
+  };
+
+  // Standard Navigation
   const handleNavigate = (screen) => {
+    if (screen === 'home') {
+      setIsVideoPlaying(false);
+      setIsVideoFadingOut(false);
+      if (videoRef.current) {
+        videoRef.current.pause();
+        videoRef.current.currentTime = 0;
+      }
+    }
     setCurrentScreen(screen);
     const el = document.getElementById('game-viewport');
     if (el) el.scrollTop = 0;
@@ -27,63 +144,112 @@ export default function App() {
   return (
     <div className="phone-container">
       <div className="phone-screen">
-        
-        {/* Game Viewport */}
         <div id="game-viewport" className="screen-content">
-          {/* Mode Selection Screen (1 or 2) */}
-          {currentScreen === 'mode' && (
-            <ModeSelectScreen onSelectMode={handleSelectMode} />
+
+          {/* 0. Initial Role Selection Screen (Frontline RM vs Leadership Role) */}
+          {currentScreen === 'roleSelect' && (
+            <RoleSelectScreen onSelectRole={handleSelectRole} />
           )}
 
-          {/* Intro Screen */}
+          {/* 1. Circular Sweep Loader (Reference Style with sweep spinner & DREAMS) */}
+          {currentScreen === 'loading' && (
+            <LoaderScreen onLoaded={handleLoaded} />
+          )}
+
+          {/* 2 & 3. Seamless Start Screen Dissolve to Clean Video */}
           {currentScreen === 'home' && (
-            <HomeScreen 
-              onNavigate={() => {
-                // If Option 1: go to Lane Console
-                // If Option 2: skip Lane Console, go directly to Road Screen
-                if (gameMode === 1) {
-                  handleNavigate('lane');
-                } else {
-                  handleNavigate('journey');
-                }
-              }} 
-            />
+            <div
+              style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+                overflow: 'hidden',
+                background: '#000000'
+              }}
+            >
+              {/* Clean Video Element (No buttons, no mute/skip, no timeline bar) */}
+              <video
+                ref={videoRef}
+                src="./assets/clip.mp4"
+                playsInline
+                preload="auto"
+                controls={false}
+                controlsList="nodownload noplaybackrate nofullscreen noremoteplayback"
+                disablePictureInPicture
+                disableRemotePlayback
+                tabIndex={-1}
+                aria-hidden="true"
+                onTimeUpdate={handleVideoTimeUpdate}
+                onEnded={handleVideoEnded}
+                onError={handleVideoError}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: 'center',
+                  display: 'block',
+                  zIndex: 1,
+                  pointerEvents: 'none',
+                  opacity: isVideoPlaying ? (isVideoFadingOut ? 0 : 1) : 0,
+                  transition: isVideoFadingOut
+                    ? 'opacity 1.5s ease-out'
+                    : 'opacity 0.6s ease-in-out',
+                  willChange: 'opacity'
+                }}
+              />
+
+              {/* Poster and "Start the journey" CTA Layer */}
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  zIndex: 2,
+                  opacity: isVideoPlaying ? 0 : 1,
+                  pointerEvents: isVideoPlaying ? 'none' : 'auto',
+                  transition: 'opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1)',
+                  willChange: 'opacity'
+                }}
+              >
+                <HomeScreen onStartJourney={handleStartJourney} />
+              </div>
+            </div>
           )}
 
-          {/* Lane & Target Console (Option 1 only) */}
+          {/* 4. Second Screen (Lane Selection) with smooth fade-in animation */}
           {currentScreen === 'lane' && (
-            <LaneScreen 
-              selectedLane={selectedLane} 
-              onSelectLane={setSelectedLane} 
-              wap={wap}
-              setWap={setWap}
-              gameMode={gameMode}
-              onNavigate={() => {
-                // For Option 1, goes directly to True/False question screen
-                handleNavigate('rules');
-              }} 
-            />
-          )}
-
-          {/* Road Screen (Option 2: selects directly from road, no car, then goes to True/False) */}
-          {currentScreen === 'journey' && (
-            <JourneyScreen 
-              selectedLane={selectedLane} 
+            <LaneScreen
+              selectedLane={selectedLane}
               onSelectLane={setSelectedLane}
               wap={wap}
               setWap={setWap}
-              onNavigate={() => {
-                handleNavigate('rules');
-              }} 
+              gameMode={gameMode}
+              userRole={userRole}
+              onNavigate={() => handleNavigate('rules')}
             />
           )}
 
-          {/* True / False Questions Screen */}
-          {currentScreen === 'rules' && (
-            <RuleQuestScreen onNavigate={handleNavigate} gameMode={gameMode} />
+          {/* Road Screen (Option 2) */}
+          {currentScreen === 'journey' && (
+            <JourneyScreen
+              selectedLane={selectedLane}
+              onSelectLane={setSelectedLane}
+              wap={wap}
+              setWap={setWap}
+              onNavigate={() => handleNavigate('rules')}
+            />
           )}
-        </div>
 
+          {/* 5. Rule Quest Questions Screen */}
+          {currentScreen === 'rules' && (
+            <RuleQuestScreen
+              onNavigate={handleNavigate}
+              gameMode={gameMode}
+            />
+          )}
+
+        </div>
       </div>
     </div>
   );

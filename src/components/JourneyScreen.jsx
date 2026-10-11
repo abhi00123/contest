@@ -18,6 +18,7 @@ export default function JourneyScreen({ selectedLane, onSelectLane, wap, setWap,
       code: 'B',
       target: targets[0],
       reward: '10K Reward Points (RM only)',
+      medalImg: './assets/medals/Bronze.png',
       medalBg: 'radial-gradient(circle at 32% 32%, #FFD6A5, #C67D42 58%, #7B3E14)',
       medalBorder: '#F0B98A',
       medalColor: '#3B1E08',
@@ -36,6 +37,7 @@ export default function JourneyScreen({ selectedLane, onSelectLane, wap, setWap,
       code: 'S',
       target: targets[1],
       reward: '25K Reward Points (RM only)',
+      medalImg: './assets/medals/Silver.png',
       medalBg: 'radial-gradient(circle at 32% 32%, #FFFFFF, #D5DDE8 58%, #8A97A8)',
       medalBorder: '#FFFFFF',
       medalColor: '#1E293B',
@@ -54,6 +56,7 @@ export default function JourneyScreen({ selectedLane, onSelectLane, wap, setWap,
       code: 'G',
       target: targets[2],
       reward: 'Sales Training Program, Prague',
+      medalImg: './assets/medals/Golden.png',
       medalBg: 'radial-gradient(circle at 32% 32%, #FFF4B8, #F5B838 58%, #9C6F0A)',
       medalBorder: '#F6D77F',
       medalColor: '#2A1C02',
@@ -73,6 +76,7 @@ export default function JourneyScreen({ selectedLane, onSelectLane, wap, setWap,
       code: 'T',
       target: targets[3],
       reward: 'Prague Trip + 25K Reward Points',
+      medalImg: './assets/medals/Titanium.png',
       medalBg: 'radial-gradient(circle at 32% 32%, #E0F2FE, #38BDF8 58%, #0369A1)',
       medalBorder: '#93C5FD',
       medalColor: '#04162C',
@@ -91,6 +95,7 @@ export default function JourneyScreen({ selectedLane, onSelectLane, wap, setWap,
       code: 'P',
       target: targets[4],
       reward: 'Prague Trip + 50K Reward Points',
+      medalImg: './assets/medals/Platinum.png',
       medalBg: 'radial-gradient(circle at 32% 32%, #FAF5FF, #C084FC 58%, #4C1D95)',
       medalBorder: '#F3E8FF',
       medalColor: '#1A0B2E',
@@ -471,23 +476,43 @@ export default function JourneyScreen({ selectedLane, onSelectLane, wap, setWap,
                 transition: 'all 0.25s ease'
               }}>
                 {/* Circular Metallic Medal on Left */}
-                <div style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: 12,
-                  background: st.medalBg,
-                  border: `1.5px solid ${st.medalBorder}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: st.medalColor,
-                  fontSize: st.id === 'platinum' ? '11px' : (st.id === 'titanium' ? '9.5px' : '10.5px'),
-                  fontWeight: 900,
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.6)',
-                  flexShrink: 0
-                }}>
-                  {st.symbol}
-                </div>
+                {st.medalImg ? (
+                  <img
+                    src={st.medalImg}
+                    alt={st.name}
+                    style={{
+                      width: 26,
+                      height: 26,
+                      objectFit: 'contain',
+                      filter: 'drop-shadow(0 2px 5px rgba(0,0,0,0.6))',
+                      flexShrink: 0
+                    }}
+                    onError={(e) => {
+                      const fallback = st.medalImg.replace('.', '');
+                      if (!e.target.src.includes(fallback)) {
+                        e.target.src = fallback;
+                      }
+                    }}
+                  />
+                ) : (
+                  <div style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: 12,
+                    background: st.medalBg,
+                    border: `1.5px solid ${st.medalBorder}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: st.medalColor,
+                    fontSize: st.id === 'platinum' ? '11px' : (st.id === 'titanium' ? '9.5px' : '10.5px'),
+                    fontWeight: 900,
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.6)',
+                    flexShrink: 0
+                  }}>
+                    {st.symbol}
+                  </div>
+                )}
 
                 {/* Text on Right */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>

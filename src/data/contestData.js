@@ -69,55 +69,79 @@ export const LANES_DATA = [
   { label: 'Commercial / BBG / Other', full: 'Commercial / Corporate / BBG / Other', t: [16, 32, 48, 60, 72] }
 ];
 
-// 8 Rule Quest Cards
+// 6 Rule Quest Cards: Know Your WOW
 export const RULE_QUEST_CARDS = [
   {
-    topic: 'Policy mode',
-    s: 'A monthly-mode policy logged on 20 October counts toward your WAP.',
-    a: false,
-    why: 'Only Annual / Yearly mode cases are considered for the contest.'
+    id: 1,
+    q: 'What is the contest duration for the CEO’s World of Winners (WOW)?',
+    options: [
+      'October only',
+      'October & November',
+      'October, November & December'
+    ],
+    correct: 2,
+    answerText: 'October, November & December',
+    why: 'The WOW contest runs across October, November & December.'
   },
   {
-    topic: 'Dates',
-    s: 'A case logged on 30 December and issued on 4 January 2027 counts.',
-    a: true,
-    why: 'Login 1 Oct – 31 Dec 2026, issuance by 5 Jan 2027. Both boxes ticked.'
+    id: 2,
+    q: 'Which product categories are covered under the WOW contest?',
+    options: [
+      'Life Insurance (LI)',
+      'General Insurance (GI)',
+      'Health Insurance (HI)',
+      'All of the above'
+    ],
+    correct: 3,
+    answerText: 'All of the above',
+    why: 'All three product categories (LI, GI & HI) are considered.'
   },
   {
-    topic: 'Premium',
-    s: 'GST on the premium is added to your contest points.',
-    a: false,
-    why: 'The GST component is excluded when points are calculated.'
+    id: 3,
+    q: 'For how long is the Bronze slab applicable?',
+    options: [
+      'October only',
+      'October & November',
+      'October, November & December'
+    ],
+    correct: 0,
+    answerText: 'October only',
+    why: 'The Bronze slab is applicable for October only.'
   },
   {
-    topic: 'Free look',
-    s: 'A policy cancelled during the free-look period still counts.',
-    a: false,
-    why: 'Results are computed net of free-look cancellations.'
+    id: 4,
+    q: 'For how long is the Silver slab applicable?',
+    options: [
+      'October only',
+      'October & November',
+      'October, November & December'
+    ],
+    correct: 1,
+    answerText: 'October & November',
+    why: 'The Silver slab is applicable for October & November.'
   },
   {
-    topic: 'Slabs',
-    s: 'Hit both Silver and Gold, and you collect both rewards.',
-    a: false,
-    why: 'Only your highest slab is considered for qualification.'
+    id: 5,
+    q: 'If SI tagging is not done for a Life Insurance policy, there will be no impact on your achievement calculation.',
+    options: [
+      'True',
+      'False'
+    ],
+    correct: 1,
+    answerText: 'False',
+    why: 'If SI tagging is not completed, only 75% of the EPI amount will be considered for achievement calculations.'
   },
   {
-    topic: 'Persistency',
-    s: 'Every participant needs 80% LI persistency (13M rolling, overall base).',
-    a: true,
-    why: 'Across HDFC Life, Bajaj Life and ICICI Pru. Persistency clawback applies before final results.'
-  },
-  {
-    topic: 'KYC',
-    s: 'CRM KYC / CIF number is optional for GI cases.',
-    a: false,
-    why: 'CRM KYC / CIF is mandatory for every case: LI, GI and HI.'
-  },
-  {
-    topic: 'Conduct',
-    s: 'Mapping-change cases are counted in the contest.',
-    a: false,
-    why: 'Mapping-change cases are excluded. Force-selling or mis-selling means exclusion and strict action.'
+    id: 6,
+    q: 'What is the minimum persistency required to qualify for WOW?',
+    options: [
+      '70%',
+      '80%',
+      '90%'
+    ],
+    correct: 1,
+    answerText: '80%',
+    why: 'Achieving your sales target alone is not sufficient. If your persistency is below 80%, you will be disqualified from the contest, regardless of target achievement.'
   }
 ];
 
