@@ -547,6 +547,18 @@ export default function JourneyScreen({ selectedLane, onSelectLane, wap, setWap,
                       Lacs
                     </span>
                   </div>
+
+                  {/* Validity indication for Bronze and Silver */}
+                  {st.id === 'bronze' && (
+                    <span style={{ fontSize: '8.5px', fontWeight: 800, color: '#FCD34D', letterSpacing: '0.01em', whiteSpace: 'nowrap' }}>
+                      October only
+                    </span>
+                  )}
+                  {st.id === 'silver' && (
+                    <span style={{ fontSize: '8px', fontWeight: 800, color: '#E2E8F0', letterSpacing: '-0.01em', whiteSpace: 'nowrap' }}>
+                      October + November only
+                    </span>
+                  )}
                 </div>
               </div>
 

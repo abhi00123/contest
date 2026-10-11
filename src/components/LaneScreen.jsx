@@ -194,6 +194,7 @@ const TIER_CONFIGS = [
     reward: '10K Reward Points (RM only)',
     rewardBadge: '10K PTS',
     subtitle: '10K Pts',
+    validity: 'October only',
     pillLabel: '10K PTS',
     color: '#E3A06B',
     accentBorder: '#D97706',
@@ -232,6 +233,7 @@ const TIER_CONFIGS = [
     reward: '25K Reward Points (RM only)',
     rewardBadge: '25K PTS',
     subtitle: '25K Pts',
+    validity: 'October + November only',
     pillLabel: '25K PTS',
     color: '#E2E8F0',
     accentBorder: '#CBD5E1',
@@ -270,6 +272,7 @@ const TIER_CONFIGS = [
     reward: 'Sales Training Program, Prague',
     rewardBadge: 'PRAGUE TRIP',
     subtitle: 'Prague Trip',
+    validity: 'Oct – Dec',
     pillLabel: 'PRAGUE TRIP',
     color: '#F6D77F',
     accentBorder: '#F5B838',
@@ -308,6 +311,7 @@ const TIER_CONFIGS = [
     reward: 'Prague Trip + 25K Reward Points',
     rewardBadge: 'PRAGUE + 25K',
     subtitle: '≈25K Pts',
+    validity: 'Oct – Dec',
     pillLabel: 'PRAGUE + 25K',
     color: '#93C5FD',
     accentBorder: '#3B82F6',
@@ -346,6 +350,7 @@ const TIER_CONFIGS = [
     reward: 'Prague Trip + 50K Reward Points',
     rewardBadge: 'PRAGUE + 50K',
     subtitle: '≈50K Pts',
+    validity: 'Oct – Dec',
     pillLabel: 'PRAGUE + 50K',
     color: '#C084FC',
     accentBorder: '#A855F7',
@@ -757,6 +762,62 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
                 }}>
                   <AnimatedCount value={targetVal} />
                 </div>
+
+                {/* Validity Indication (Clear, unboxed, bold text) */}
+                {idx === 0 && (
+                  <span style={{
+                    position: 'relative',
+                    zIndex: 2,
+                    marginTop: 'clamp(2px, 0.4vh, 4px)',
+                    fontSize: 'clamp(9.5px, 1.3vh, 12px)',
+                    fontWeight: 900,
+                    letterSpacing: '0.01em',
+                    color: isSelected ? '#FFE28A' : '#F59E0B',
+                    whiteSpace: 'nowrap',
+                    lineHeight: 1.15,
+                    textShadow: isSelected ? '0 0 8px rgba(245, 158, 11, 0.6)' : '0 1px 4px rgba(0, 0, 0, 0.9)'
+                  }}>
+                    October only
+                  </span>
+                )}
+
+                {idx === 1 && (
+                  <span style={{
+                    position: 'relative',
+                    zIndex: 2,
+                    marginTop: 'clamp(2px, 0.4vh, 4px)',
+                    fontSize: 'clamp(8.5px, 1.18vh, 11px)',
+                    fontWeight: 900,
+                    letterSpacing: '-0.01em',
+                    color: isSelected ? '#FFFFFF' : '#CBD5E1',
+                    lineHeight: 1.12,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    textShadow: isSelected ? '0 0 8px rgba(226, 232, 240, 0.7)' : '0 1px 4px rgba(0, 0, 0, 0.9)'
+                  }}>
+                    <span>October +</span>
+                    <span>November only</span>
+                  </span>
+                )}
+
+                {idx >= 2 && (
+                  <span style={{
+                    position: 'relative',
+                    zIndex: 2,
+                    marginTop: 'clamp(2px, 0.4vh, 4px)',
+                    fontSize: 'clamp(9.5px, 1.3vh, 12px)',
+                    fontWeight: 900,
+                    letterSpacing: '0.02em',
+                    color: isSelected ? '#FFFFFF' : '#94A3B8',
+                    whiteSpace: 'nowrap',
+                    lineHeight: 1.15,
+                    textShadow: isSelected ? `0 0 8px ${tier.glowColor}` : '0 1px 4px rgba(0, 0, 0, 0.9)'
+                  }}>
+                    Oct – Dec
+                  </span>
+                )}
               </div>
             );
           })}
@@ -842,21 +903,50 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
             borderTop: '1px solid rgba(255, 255, 255, 0.14)',
             paddingTop: 'clamp(6px, 0.85vh, 9px)',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             textAlign: 'center',
+            gap: 'clamp(3px, 0.45vh, 6px)',
             width: '100%'
           }}>
             <span style={{
               fontFamily: "'Plus Jakarta Sans', sans-serif",
-              fontSize: 'clamp(13px, 1.75vh, 16px)',
-              fontWeight: 800,
+              fontSize: 'clamp(15px, 2vh, 18.5px)',
+              fontWeight: 900,
               color: TIER_CONFIGS[selectedTierIndex].color,
               letterSpacing: '0.02em',
               textShadow: '0 2px 8px rgba(0,0,0,0.5)'
             }}>
               {TIER_CONFIGS[selectedTierIndex].reward}
             </span>
+
+            {/* Prominent Indication for Bronze & Silver without emoji or underline */}
+            {selectedTierIndex === 0 && (
+              <span style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: 'clamp(13px, 1.75vh, 15.5px)',
+                fontWeight: 800,
+                color: '#FDE68A',
+                letterSpacing: '0.02em',
+                textShadow: '0 1px 4px rgba(0,0,0,0.7)'
+              }}>
+                Applicable for <span style={{ color: '#F59E0B', fontWeight: 900 }}>October only</span>
+              </span>
+            )}
+
+            {selectedTierIndex === 1 && (
+              <span style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: 'clamp(13px, 1.75vh, 15.5px)',
+                fontWeight: 800,
+                color: '#FFFFFF',
+                letterSpacing: '0.02em',
+                textShadow: '0 1px 4px rgba(0,0,0,0.7)'
+              }}>
+                Applicable for <span style={{ color: '#CBD5E1', fontWeight: 900 }}>October + November only</span>
+              </span>
+            )}
           </div>
         </div>
 
