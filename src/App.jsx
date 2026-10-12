@@ -3,7 +3,6 @@ import RoleSelectScreen from './components/RoleSelectScreen';
 import LoaderScreen from './components/LoaderScreen';
 import HomeScreen from './components/HomeScreen';
 import LaneScreen from './components/LaneScreen';
-import JourneyScreen from './components/JourneyScreen';
 import RuleQuestScreen from './components/RuleQuestScreen';
 import { sound } from './utils/sound';
 
@@ -11,7 +10,6 @@ export default function App() {
   // Screen sequence: 'roleSelect' -> 'loading' -> 'home' (with seamless video dissolve) -> 'lane' -> 'rules'
   const [currentScreen, setCurrentScreen] = useState('roleSelect');
   const [userRole, setUserRole] = useState(null); // 'frontline' or 'leadership'
-  const [gameMode, setGameMode] = useState(1); // 1: Direct Quest
   const [selectedLane, setSelectedLane] = useState(2); // BBRL Staff Urban & Metro
   const [wap, setWap] = useState(0);
 
@@ -21,39 +19,42 @@ export default function App() {
   const videoRef = useRef(null);
   const audioFadeRef = useRef(null);
 
-  // Continuously suppress and purge any third-party video speed controller badges (1.00)
+  // Suppress and purge third-party browser extension overlays without layout thrashing
   useEffect(() => {
+    let timeoutId;
     const purgeVideoOverlays = () => {
-      // 1. Remove any known extension elements
+      // 1. Remove extension controller elements
       const extensionBadges = document.querySelectorAll(
         '.vsc-controller, .vsc-modifier, #vsc-controller, [data-vscid], [class*="vsc-"], [id*="vsc-"]'
       );
       extensionBadges.forEach((el) => el.remove());
 
-      // 2. Purge any stray element overlaying top-left with "1.00" / "1.00x"
-      const allDivs = document.querySelectorAll('div, span, p');
-      allDivs.forEach((el) => {
-        if (
-          el.id === 'root' ||
-          el.id === 'game-viewport' ||
-          el.classList.contains('phone-container') ||
-          el.classList.contains('phone-screen')
-        ) return;
-        const text = el.textContent?.trim();
+      // 2. Check direct children of body for stray overlay badges
+      Array.from(document.body.children).forEach((child) => {
+        if (child.id === 'root') return;
+        const text = child.textContent?.trim();
         if (text === '1.00' || text === '1.0' || text === '1.00x' || text === '1.0x') {
-          const style = window.getComputedStyle(el);
-          if (style.position === 'absolute' || style.position === 'fixed') {
-            el.remove();
-          }
+          child.remove();
         }
       });
     };
 
     purgeVideoOverlays();
-    const observer = new MutationObserver(purgeVideoOverlays);
-    observer.observe(document.body, { childList: true, subtree: true });
 
-    return () => observer.disconnect();
+    const observer = new MutationObserver(() => {
+      if (timeoutId) return;
+      timeoutId = setTimeout(() => {
+        timeoutId = null;
+        purgeVideoOverlays();
+      }, 300);
+    });
+
+    observer.observe(document.body, { childList: true });
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      observer.disconnect();
+    };
   }, []);
 
   // 0. Role Selection -> Starts loading screen
@@ -81,7 +82,7 @@ export default function App() {
         audioFadeRef.current = null;
       }
       videoRef.current.currentTime = 0;
-      videoRef.current.volume = 1; // Full initial volume
+      videoRef.current.volume = 1;
       const playPromise = videoRef.current.play();
       if (playPromise !== undefined) {
         playPromise.catch((err) => {
@@ -105,7 +106,6 @@ export default function App() {
     if (remaining <= 1.5 && !isVideoFadingOut) {
       setIsVideoFadingOut(true);
 
-      // Smooth audio volume fade out in exact sync with 1.5s visual dissolve
       const fadeDuration = 1500; // 1.5 seconds in ms
       const startVolume = video.volume > 0 ? video.volume : 1;
       const startTime = performance.now();
@@ -115,7 +115,6 @@ export default function App() {
       const fadeAudio = (now) => {
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / fadeDuration, 1);
-        // Smooth logarithmic/linear volume reduction
         const newVolume = Math.max(0, startVolume * (1 - progress));
         if (videoRef.current) {
           videoRef.current.volume = newVolume;
@@ -141,15 +140,9 @@ export default function App() {
     if (videoRef.current) {
       videoRef.current.volume = 1;
     }
-    // Purge any third-party controller overlay before screen switch
-    document.querySelectorAll('.vsc-controller, .vsc-modifier, #vsc-controller, [data-vscid], [class*="vsc-"], [id*="vsc-"]').forEach(el => el.remove());
     setIsVideoPlaying(false);
     setIsVideoFadingOut(false);
-    if (gameMode === 1) {
-      setCurrentScreen('lane');
-    } else {
-      setCurrentScreen('journey');
-    }
+    setCurrentScreen('lane');
   };
 
   // Fallback if video relative path needs root slash
@@ -189,12 +182,12 @@ export default function App() {
       <div className="phone-screen">
         <div id="game-viewport" className="screen-content">
 
-          {/* 0. Initial Role Selection Screen (Frontline RM vs Leadership Role) */}
+          {/* 0. Initial Role Selection Screen */}
           {currentScreen === 'roleSelect' && (
             <RoleSelectScreen onSelectRole={handleSelectRole} />
           )}
 
-          {/* 1. Circular Sweep Loader (Reference Style with sweep spinner & DREAMS) */}
+          {/* 1. Circular Sweep Loader */}
           {currentScreen === 'loading' && (
             <LoaderScreen onLoaded={handleLoaded} />
           )}
@@ -260,26 +253,14 @@ export default function App() {
             </div>
           )}
 
-          {/* 4. Second Screen (Lane Selection) with smooth fade-in animation */}
+          {/* 4. Second Screen (Lane Selection) */}
           {currentScreen === 'lane' && (
             <LaneScreen
               selectedLane={selectedLane}
               onSelectLane={setSelectedLane}
               wap={wap}
               setWap={setWap}
-              gameMode={gameMode}
               userRole={userRole}
-              onNavigate={() => handleNavigate('rules')}
-            />
-          )}
-
-          {/* Road Screen (Option 2) */}
-          {currentScreen === 'journey' && (
-            <JourneyScreen
-              selectedLane={selectedLane}
-              onSelectLane={setSelectedLane}
-              wap={wap}
-              setWap={setWap}
               onNavigate={() => handleNavigate('rules')}
             />
           )}
@@ -288,7 +269,6 @@ export default function App() {
           {currentScreen === 'rules' && (
             <RuleQuestScreen
               onNavigate={handleNavigate}
-              gameMode={gameMode}
             />
           )}
 

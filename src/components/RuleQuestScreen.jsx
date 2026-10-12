@@ -12,7 +12,7 @@ function shuffleArray(arr) {
   return copy;
 }
 
-export default function RuleQuestScreen({ onNavigate, gameMode = 1 }) {
+export default function RuleQuestScreen({ onNavigate }) {
   // Questions are dynamically randomized every session
   const [cards, setCards] = useState(() => shuffleArray(RULE_QUEST_CARDS));
   const [idx, setIdx] = useState(0);
@@ -578,7 +578,7 @@ export default function RuleQuestScreen({ onNavigate, gameMode = 1 }) {
             </button>
             <button
               type="button"
-              onClick={() => onNavigate(gameMode === 1 ? 'lane' : 'journey')}
+              onClick={() => onNavigate('lane')}
               style={{
                 flex: 1.25,
                 height: 'clamp(50px, 6.4vh, 60px)',
@@ -602,7 +602,7 @@ export default function RuleQuestScreen({ onNavigate, gameMode = 1 }) {
               onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.97)'; }}
               onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
             >
-              <span style={{ WebkitTextStroke: '0.5px #1A1202' }}>{gameMode === 1 ? 'Review Lane' : 'Review Roadmap'}</span>
+              <span style={{ WebkitTextStroke: '0.5px #1A1202' }}>Review Lane</span>
               <span style={{ fontSize: '18px', fontWeight: 900, WebkitTextStroke: '0.5px #1A1202' }}>➔</span>
             </button>
           </div>

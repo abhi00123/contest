@@ -98,7 +98,7 @@ body {
   flex-direction: column;
 }
 
-/* Active Screen Body Viewport - Strictly Non-Scrolling */
+/* Active Screen Body Viewport */
 .screen-content {
   flex: 1;
   width: 100%;
@@ -127,140 +127,24 @@ body {
   overflow-x: hidden !important;
 }
 
-/* Tactical HUD & Gaming Styles */
-.hud-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(233, 185, 73, 0.12);
-  border: 1px solid rgba(233, 185, 73, 0.3);
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--gold-light);
-}
-
-.tactical-tab {
-  padding: 7px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  border: 1px solid transparent;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  white-space: nowrap;
-}
-
-.tactical-tab-active {
-  background: linear-gradient(135deg, rgba(233, 185, 73, 0.25) 0%, rgba(26, 40, 90, 0.95) 100%);
-  border-color: var(--gold-primary);
-  color: var(--gold-light);
-  box-shadow: 0 4px 14px rgba(233, 185, 73, 0.25);
-  transform: translateY(-1px);
-}
-
-.tactical-tab-inactive {
-  background: rgba(18, 30, 69, 0.55);
-  border-color: rgba(36, 52, 106, 0.8);
-  color: var(--slate-text);
-}
-.tactical-tab-inactive:hover {
-  background: rgba(26, 42, 92, 0.7);
-  color: var(--cream-text);
-}
-
-.game-role-card {
-  position: relative;
-  border-radius: 14px;
-  padding: 10px 12px;
-  cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  text-align: left;
-  overflow: hidden;
-  box-sizing: border-box;
-  width: 100%;
-}
-.game-role-card:active {
-  transform: scale(0.97);
-}
-
-.game-role-card-active {
-  background: linear-gradient(135deg, rgba(233, 185, 73, 0.22) 0%, rgba(16, 27, 66, 0.98) 100%);
-  border: 1.5px solid #F6D77F;
-  box-shadow: 0 4px 18px rgba(233, 185, 73, 0.3), inset 0 0 14px rgba(233, 185, 73, 0.12);
-}
-
-.game-role-card-inactive {
-  background: rgba(14, 24, 58, 0.65);
-  border: 1px solid rgba(36, 52, 106, 0.85);
-}
-.game-role-card-inactive:hover {
-  background: rgba(20, 34, 78, 0.85);
-  border-color: rgba(233, 185, 73, 0.4);
-}
-
-/* Luxury Glass Cards */
-.glass-card {
-  background: var(--bg-glass);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--border-blue);
-  border-radius: 18px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-  transition: all 0.25s ease;
-}
-
-.glass-card-gold {
-  background: linear-gradient(135deg, rgba(233, 185, 73, 0.12) 0%, rgba(18, 30, 69, 0.8) 100%);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--border-gold);
-  border-radius: 18px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(233, 185, 73, 0.15);
-}
-
 /* Animations */
 @keyframes rtpFloat {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
 }
-@keyframes rtpShine {
-  0% { transform: translateX(-140%) rotate(20deg); }
-  60%, 100% { transform: translateX(240%) rotate(20deg); }
-}
-@keyframes rtpTwinkle {
-  0%, 100% { opacity: 0.25; }
-  50% { opacity: 1; }
-}
-@keyframes rtpPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(233, 185, 73, 0.55); }
-  50% { box-shadow: 0 0 0 12px rgba(233, 185, 73, 0); }
-}
-@keyframes crownFloat {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-4px) rotate(-2deg); }
-}
-@keyframes goldCardHalo {
-  0%, 100% {
-    box-shadow: 0 0 16px rgba(245, 184, 56, 0.45), inset 0 0 10px rgba(245, 184, 56, 0.2);
-    border-color: #F5B838;
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(245, 184, 56, 0.8), inset 0 0 16px rgba(245, 184, 56, 0.35);
-    border-color: #FFF0B8;
-  }
+
+@keyframes planeHover {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(6px, -4px) rotate(1deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
 }
 
-/* Luxury Highlight Animations for Prague-Qualifying Tiers */
+@keyframes goldBtnShine {
+  0% { left: -120%; }
+  35%, 100% { left: 160%; }
+}
+
+/* Highlight Animations for Prague Tiers */
 @keyframes goldTierPulse {
   0%, 100% {
     box-shadow: 0 0 16px rgba(245, 184, 56, 0.45), inset 0 0 10px rgba(245, 184, 56, 0.2);
@@ -298,310 +182,30 @@ body {
   0% { transform: translateX(-150%) skewX(-20deg); }
   35%, 100% { transform: translateX(250%) skewX(-20deg); }
 }
-@keyframes planeHover {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(6px, -4px) rotate(1deg); }
-  100% { transform: translate(0, 0) rotate(0deg); }
-}
-@keyframes numPop {
-  0% { transform: scale(0.88); opacity: 0.6; }
-  65% { transform: scale(1.08); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
-}
-@keyframes goldBtnShine {
-  0% { left: -120%; }
-  35%, 100% { left: 160%; }
-}
-@keyframes rtpRing {
-  0% { transform: scale(1); opacity: 0.8; }
-  100% { transform: scale(2.0); opacity: 0; }
-}
-@keyframes rtpDash {
-  to { stroke-dashoffset: -28; }
-}
-@keyframes rtpStamp {
-  0% { transform: scale(2.4) rotate(-22deg); opacity: 0; }
-  60% { transform: scale(0.92) rotate(-12deg); opacity: 1; }
-  100% { transform: scale(1) rotate(-12deg); opacity: 1; }
-}
 
-@keyframes stampSlamPhysical {
+@keyframes applicablePulseBronze {
   0% {
-    transform: scale(2.6) rotate(-26deg);
-    opacity: 0;
-  }
-  42% {
-    transform: scale(0.92) rotate(-9deg);
-    opacity: 1;
-  }
-  68% {
-    transform: scale(1.06) rotate(-7deg);
-  }
-  86% {
-    transform: scale(0.98) rotate(-8deg);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.45), 0 0 20px rgba(217, 119, 6, 0.25), inset 0 0 6px rgba(245, 158, 11, 0.2);
+    border-color: rgba(245, 158, 11, 0.65);
   }
   100% {
-    transform: scale(1) rotate(-8deg);
-    opacity: 1;
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.9), 0 0 35px rgba(245, 158, 11, 0.5), inset 0 0 14px rgba(245, 158, 11, 0.35);
+    border-color: #FCD34D;
   }
 }
 
-@keyframes stampImpactRing {
+@keyframes applicablePulseSilver {
   0% {
-    transform: scale(0.5);
-    opacity: 0.95;
+    box-shadow: 0 0 10px rgba(226, 232, 240, 0.45), 0 0 20px rgba(148, 163, 184, 0.25), inset 0 0 6px rgba(226, 232, 240, 0.2);
+    border-color: rgba(226, 232, 240, 0.65);
   }
   100% {
-    transform: scale(1.6);
-    opacity: 0;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.9), 0 0 35px rgba(226, 232, 240, 0.5), inset 0 0 14px rgba(226, 232, 240, 0.35);
+    border-color: #FFFFFF;
   }
 }
 
-.stamp-slam-container {
-  animation: stampSlamPhysical 0.42s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
-  will-change: transform, opacity;
-  transform-origin: center center;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-}
-
-.stamp-shockwave {
-  animation: stampImpactRing 0.5s ease-out forwards;
-  will-change: transform, opacity;
-}
-
-@keyframes rtpRise {
-  from { transform: translateY(35px); opacity: 0; }
-  to { transform: none; opacity: 1; }
-}
-@keyframes coinGlow {
-  0%, 100% { filter: drop-shadow(0 0 12px rgba(233, 185, 73, 0.4)); }
-  50% { filter: drop-shadow(0 0 24px rgba(233, 185, 73, 0.75)); }
-}
-
-.rtp-medal { animation: rtpFloat 3.2s ease-in-out infinite; }
-.rtp-shine { animation: rtpShine 3.6s ease-in-out infinite; }
-.rtp-star { animation: rtpTwinkle 2.4s ease-in-out infinite; }
-.rtp-cta { animation: rtpPulse 2.2s ease-out infinite; }
-.rtp-ring { animation: rtpRing 1.6s ease-out infinite; }
-.rtp-route { animation: rtpDash 1.2s linear infinite; }
-.rtp-stamp { animation: rtpStamp 0.48s cubic-bezier(.2,.8,.2,1) forwards; }
-.rtp-rise { animation: rtpRise 0.5s cubic-bezier(.2,.8,.2,1); }
-.rtp-coin { animation: coinGlow 2.5s ease-in-out infinite; }
-
-/* Buttons */
-.primary-btn {
-  height: 54px;
-  border-radius: 27px;
-  background: linear-gradient(135deg, #F8E19B 0%, #E9B949 50%, #B8851C 100%);
-  color: #1A1405;
-  font-family: 'Outfit', sans-serif;
-  font-weight: 800;
-  font-size: 16px;
-  letter-spacing: .02em;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  cursor: pointer;
-  box-shadow: 0 8px 24px rgba(233, 185, 73, 0.35);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  text-decoration: none;
-  width: 100%;
-}
-.primary-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 28px rgba(233, 185, 73, 0.5);
-}
-.primary-btn:active {
-  transform: scale(0.97);
-}
-
-.secondary-btn {
-  flex: 1;
-  height: 48px;
-  border-radius: 24px;
-  border: 1px solid var(--border-blue);
-  background: var(--bg-card);
-  color: var(--cream-text);
-  font-family: 'Outfit', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-.secondary-btn:hover {
-  border-color: var(--gold-primary);
-  color: var(--gold-light);
-  transform: translateY(-1px);
-}
-.secondary-btn:active {
-  transform: scale(0.97);
-}
-
-/* Custom Interactive Range Slider */
-input[type=range].rtp-range {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 8px;
-  border-radius: 4px;
-  background: #162452;
-  outline: none;
-  border: 1px solid var(--border-blue);
-}
-input[type=range].rtp-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 12px;
-  background: radial-gradient(circle at 35% 35%, #FFF5D0, #E9B949 60%, #9C7215);
-  border: 2px solid #FFFFFF;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 10px rgba(233, 185, 73, 0.6);
-  transition: transform 0.15s ease;
-}
-input[type=range].rtp-range::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
-}
-input[type=range].rtp-range::-webkit-slider-thumb:active {
-  transform: scale(0.95);
-}
-
-/* Custom iOS Switch Toggle */
-.rtp-switch {
-  position: relative;
-  display: inline-block;
-  width: 44px;
-  height: 24px;
-  flex-shrink: 0;
-}
-.rtp-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-.rtp-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #1A2650;
-  border: 1px solid var(--border-blue);
-  transition: .3s;
-  border-radius: 12px;
-}
-.rtp-slider:before {
-  position: absolute;
-  content: "";
-  height: 18px;
-  width: 18px;
-  left: 2px;
-  bottom: 2px;
-  background-color: #AEB9D6;
-  transition: .3s;
-  border-radius: 50%;
-}
-.rtp-switch input:checked + .rtp-slider {
-  background-color: var(--gold-primary);
-  border-color: var(--gold-light);
-}
-.rtp-switch input:checked + .rtp-slider:before {
-  transform: translateX(20px);
-  background-color: #1A1405;
-}
-
-@media (max-width: 600px) {
-  body {
-    padding: 0;
-    margin: 0;
-    background: var(--bg-navy);
-    overflow: hidden !important;
-  }
-  .phone-container {
-    max-width: 100%;
-    width: 100%;
-    height: 100%;
-    height: 100dvh;
-    max-height: 100dvh;
-    border-radius: 0;
-    padding: 0;
-    border: none;
-    box-shadow: none;
-    overflow: hidden !important;
-  }
-  .phone-screen {
-    border-radius: 0;
-    height: 100%;
-    height: 100dvh;
-    overflow: hidden !important;
-  }
-}
-
-/* Prague Flight Takeoff & Airborne Cruising */
-@keyframes flightTakeoffSoar {
-  0% {
-    left: 28%;
-    top: 14%;
-    transform: translate3d(-50%, -50%, 0) scale(1) rotate(0deg);
-  }
-  22% {
-    left: 28%;
-    top: 4%;
-    transform: translate3d(-50%, -50%, 0) scale(1.18) rotate(0deg);
-  }
-  48% {
-    left: 48%;
-    top: -1%;
-    transform: translate3d(-50%, -50%, 0) scale(1.28) rotate(16deg);
-  }
-  74% {
-    left: 24%;
-    top: 1%;
-    transform: translate3d(-50%, -50%, 0) scale(1.22) rotate(-12deg);
-  }
-  100% {
-    left: 28%;
-    top: 4%;
-    transform: translate3d(-50%, -50%, 0) scale(1.18) rotate(0deg);
-  }
-}
-
-@keyframes jetAfterburner {
-  0%, 100% {
-    height: 12px;
-    opacity: 0.85;
-    filter: drop-shadow(0 0 6px #38BDF8);
-  }
-  50% {
-    height: 22px;
-    opacity: 1;
-    filter: drop-shadow(0 0 12px #F5B838) drop-shadow(0 0 18px #38BDF8);
-  }
-}
-
-.flight-airborne {
-  animation: flightTakeoffSoar 4.2s cubic-bezier(0.25, 1, 0.5, 1) infinite !important;
-}
-
-.jet-flame {
-  width: 3.5px;
-  background: linear-gradient(to bottom, #FFFFFF 0%, #38BDF8 40%, #F5B838 80%, transparent 100%);
-  border-radius: 2px;
-  animation: jetAfterburner 0.15s ease-in-out infinite;
-}
-
-/* ========================================================= */
-/* CINEMATIC SECOND SCREEN ENTRANCE ANIMATION                */
-/* ========================================================= */
+/* Cinematic Second Screen Entrance Animation */
 @keyframes secondScreenFadeIn {
   0% {
     opacity: 0;
@@ -618,9 +222,7 @@ input[type=range].rtp-range::-webkit-slider-thumb:active {
   will-change: transform, opacity;
 }
 
-/* ========================================================= */
-/* ROAD TO PRAGUE LUXURY LOADER STYLES & ANIMATIONS          */
-/* ========================================================= */
+/* Sweep Circular Loader */
 @keyframes sweepSpin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -646,62 +248,7 @@ input[type=range].rtp-range::-webkit-slider-thumb:active {
   will-change: transform;
 }
 
-@keyframes compassSpin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-@keyframes compassSpinReverse {
-  0% { transform: rotate(360deg); }
-  100% { transform: rotate(0deg); }
-}
-
-@keyframes goldPulseGlow {
-  0%, 100% {
-    filter: drop-shadow(0 0 14px rgba(245, 184, 56, 0.4)) drop-shadow(0 0 28px rgba(56, 189, 248, 0.25));
-    transform: scale(1);
-  }
-  50% {
-    filter: drop-shadow(0 0 26px rgba(245, 184, 56, 0.85)) drop-shadow(0 0 40px rgba(56, 189, 248, 0.5));
-    transform: scale(1.03);
-  }
-}
-
-@keyframes loaderBarShine {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(250%); }
-}
-
-@keyframes flightClimb {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-7px) rotate(2deg); }
-}
-
-@keyframes radarSweep {
-  0% { transform: rotate(0deg); opacity: 0.6; }
-  50% { opacity: 0.9; }
-  100% { transform: rotate(360deg); opacity: 0.6; }
-}
-
-.loader-compass-outer {
-  animation: compassSpin 20s linear infinite;
-}
-
-.loader-compass-inner {
-  animation: compassSpinReverse 14s linear infinite;
-}
-
-.loader-emblem-glow {
-  animation: goldPulseGlow 3s ease-in-out infinite;
-}
-
-.loader-jet-float {
-  animation: flightClimb 3.2s ease-in-out infinite;
-}
-
-/* ========================================================= */
-/* ONBOARDING HAND GESTURE ANIMATIONS                         */
-/* ========================================================= */
+/* Onboarding Hand Gesture Animations */
 @keyframes handFloatMotion {
   0%, 100% {
     transform: translateY(0);
@@ -726,53 +273,7 @@ input[type=range].rtp-range::-webkit-slider-thumb:active {
   }
 }
 
-/* ========================================================= */
-/* SUPPRESS VIDEO SPEED CONTROLLER & THIRD-PARTY 1.00 BADGES */
-/* ========================================================= */
-.vsc-controller,
-.vsc-modifier,
-#vsc-controller,
-[class*="vsc-"],
-[id*="vsc-"],
-[data-vscid],
-.__vsc_custom_style__,
-div[style*="top: 0"][style*="left: 0"]:not(.phone-container):not(.phone-screen):not(#root):not(#game-viewport),
-div[style*="top:0"][style*="left:0"]:not(.phone-container):not(.phone-screen):not(#root):not(#game-viewport) {
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-  transform: scale(0) !important;
-  width: 0 !important;
-  height: 0 !important;
-  max-width: 0 !important;
-  max-height: 0 !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  clip-path: inset(50%) !important;
-  position: absolute !important;
-  left: -9999px !important;
-  top: -9999px !important;
-  z-index: -99999 !important;
-}
-
-/* Hide native video controls & playback rate indicators */
-video::-webkit-media-controls {
-  display: none !important;
-}
-video::-webkit-media-controls-enclosure {
-  display: none !important;
-}
-video::-webkit-media-controls-panel {
-  display: none !important;
-}
-video::-webkit-media-controls-play-button,
-video::-webkit-media-controls-start-playback-button {
-  display: none !important;
-  -webkit-appearance: none;
-}
-
-/* Hero Logo Glow Animations for RoleSelectScreen */
+/* Hero Logo Animations for RoleSelectScreen */
 .hero-logo-wrapper {
   position: relative;
   display: flex;
@@ -837,24 +338,67 @@ video::-webkit-media-controls-start-playback-button {
   }
 }
 
-@keyframes applicablePulseBronze {
-  0% {
-    box-shadow: 0 0 10px rgba(245, 158, 11, 0.45), 0 0 20px rgba(217, 119, 6, 0.25), inset 0 0 6px rgba(245, 158, 11, 0.2);
-    border-color: rgba(245, 158, 11, 0.65);
-  }
-  100% {
-    box-shadow: 0 0 20px rgba(245, 158, 11, 0.9), 0 0 35px rgba(245, 158, 11, 0.5), inset 0 0 14px rgba(245, 158, 11, 0.35);
-    border-color: #FCD34D;
-  }
+/* Suppress Video Speed Controller & Extension Badges */
+.vsc-controller,
+.vsc-modifier,
+#vsc-controller,
+[class*="vsc-"],
+[id*="vsc-"],
+[data-vscid],
+.__vsc_custom_style__ {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: scale(0) !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  z-index: -99999 !important;
 }
 
-@keyframes applicablePulseSilver {
-  0% {
-    box-shadow: 0 0 10px rgba(226, 232, 240, 0.45), 0 0 20px rgba(148, 163, 184, 0.25), inset 0 0 6px rgba(226, 232, 240, 0.2);
-    border-color: rgba(226, 232, 240, 0.65);
+/* Hide native video controls & playback rate indicators */
+video::-webkit-media-controls {
+  display: none !important;
+}
+video::-webkit-media-controls-enclosure {
+  display: none !important;
+}
+video::-webkit-media-controls-panel {
+  display: none !important;
+}
+video::-webkit-media-controls-play-button,
+video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 600px) {
+  body {
+    padding: 0;
+    margin: 0;
+    background: var(--bg-navy);
+    overflow: hidden !important;
   }
-  100% {
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.9), 0 0 35px rgba(226, 232, 240, 0.5), inset 0 0 14px rgba(226, 232, 240, 0.35);
-    border-color: #FFFFFF;
+  .phone-container {
+    max-width: 100%;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    overflow: hidden !important;
+  }
+  .phone-screen {
+    border-radius: 0;
+    height: 100%;
+    height: 100dvh;
+    overflow: hidden !important;
   }
 }

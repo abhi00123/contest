@@ -35,38 +35,6 @@ const preloadImage = (src) => {
   });
 };
 
-const preloadVideo = (src) => {
-  return new Promise((resolve) => {
-    const video = document.createElement('video');
-    video.preload = 'auto';
-    video.muted = true;
-    video.playsInline = true;
-    video.src = src;
-
-    let finished = false;
-    const markDone = () => {
-      if (!finished) {
-        finished = true;
-        resolve();
-      }
-    };
-
-    video.addEventListener('canplaythrough', markDone, { once: true });
-    video.addEventListener('loadeddata', markDone, { once: true });
-    video.onerror = () => {
-      if (src.startsWith('./')) {
-        video.src = src.replace(/^\.\//, '/');
-        video.load();
-      } else {
-        markDone();
-      }
-    };
-
-    // Safety timeout in case of slow video buffer
-    setTimeout(markDone, 6000);
-  });
-};
-
 export default function LoaderScreen({ onLoaded }) {
   const [isFadingOut, setIsFadingOut] = useState(false);
   const animFrameRef = useRef(null);
@@ -95,12 +63,11 @@ export default function LoaderScreen({ onLoaded }) {
       }, remainingTime);
     };
 
-    // Preload ALL game images, video, and web fonts in parallel
+    // Preload all game visual assets and web fonts in parallel
     const imagePromises = GAME_IMAGE_ASSETS.map(preloadImage);
-    const videoPromise = preloadVideo('./assets/clip.mp4');
     const fontsPromise = document.fonts ? document.fonts.ready : Promise.resolve();
 
-    Promise.all([...imagePromises, videoPromise, fontsPromise]).then(() => {
+    Promise.all([...imagePromises, fontsPromise]).then(() => {
       checkFinish();
     });
 
