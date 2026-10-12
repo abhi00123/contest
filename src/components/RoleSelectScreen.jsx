@@ -23,12 +23,27 @@ export default function RoleSelectScreen({ onSelectRole }) {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: '24px 20px',
-        background: 'radial-gradient(ellipse at 50% 30%, #15244E 0%, #081026 65%, #030610 100%)',
+        padding: '16px 16px clamp(20px, 3vh, 32px)',
+        background: 'radial-gradient(ellipse at 50% 25%, #1D3576 0%, #081026 62%, #030610 100%)',
         userSelect: 'none',
-        gap: 36
+        gap: 'clamp(16px, 2.6vh, 26px)'
       }}
     >
+      {/* Prominent Hero Prague WoW Logo with Radiant Ambient Glow */}
+      <div className="hero-logo-wrapper">
+        <div className="hero-logo-ambient-glow" />
+        <img
+          src="./assets/PP.png"
+          alt="CEO's World of Winners - Prague"
+          className="hero-logo-img"
+          onError={(e) => {
+            if (e.target.src !== '/assets/PP.png') {
+              e.target.src = '/assets/PP.png';
+            }
+          }}
+        />
+      </div>
+
       {/* Top Title: Only "Select Your Role" */}
       <h1
         style={{

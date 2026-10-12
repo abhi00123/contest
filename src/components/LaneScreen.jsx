@@ -185,11 +185,12 @@ const ROLE_CONFIG = [
   }
 ];
 
-// 5 Milestone Tiers Configuration
-const TIER_CONFIGS = [
+// 5 Milestone Tiers Configuration for Frontline RM
+const FRONTLINE_TIERS = [
   {
     name: 'BRONZE',
     cleanName: 'BRONZE',
+    targetIndex: 0,
     symbol: '★',
     reward: '10K Reward Points (RM only)',
     rewardBadge: '10K PTS',
@@ -229,6 +230,7 @@ const TIER_CONFIGS = [
   {
     name: 'SILVER',
     cleanName: 'SILVER',
+    targetIndex: 1,
     symbol: '★',
     reward: '25K Reward Points (RM only)',
     rewardBadge: '25K PTS',
@@ -268,6 +270,7 @@ const TIER_CONFIGS = [
   {
     name: 'GOLD',
     cleanName: 'GOLD',
+    targetIndex: 2,
     symbol: '★',
     reward: 'Sales Training Program, Prague',
     rewardBadge: 'PRAGUE TRIP',
@@ -307,6 +310,7 @@ const TIER_CONFIGS = [
   {
     name: 'TITANIUM',
     cleanName: 'TITANIUM',
+    targetIndex: 3,
     symbol: '◆',
     reward: 'Prague Trip + 25K Reward Points',
     rewardBadge: 'PRAGUE + 25K',
@@ -346,6 +350,7 @@ const TIER_CONFIGS = [
   {
     name: 'PLATINUM',
     cleanName: 'PLATINUM',
+    targetIndex: 4,
     symbol: '★',
     reward: 'Prague Trip + 50K Reward Points',
     rewardBadge: 'PRAGUE + 50K',
@@ -384,22 +389,168 @@ const TIER_CONFIGS = [
   }
 ];
 
-export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, onNavigate, gameMode = 1 }) {
-  const currentLane = LANES_DATA[selectedLane] || LANES_DATA[5];
+// 3 Milestone Tiers Configuration for Leadership (Per CEO WOW Bancassurance Leadership.pdf: Gold, Titanium, Platinum only)
+const LEADERSHIP_TIERS = [
+  {
+    name: 'GOLD',
+    cleanName: 'GOLD',
+    targetIndex: 2,
+    symbol: '★',
+    reward: 'International Sales Training Program - PRAGUE',
+    rewardBadge: 'PRAGUE TRIP',
+    subtitle: 'Prague Trip',
+    validity: 'Oct – Dec',
+    pillLabel: 'PRAGUE TRIP',
+    color: '#F6D77F',
+    accentBorder: '#F5B838',
+    inactiveBorder: 'rgba(245, 184, 56, 0.4)',
+    glowColor: 'rgba(245, 184, 56, 0.85)',
+    bgGradient: 'linear-gradient(180deg, rgba(245, 184, 56, 0.38) 0%, rgba(14, 24, 60, 0.98) 100%)',
+    renderIcon: (selected) => (
+      <img
+        src="./assets/medals/Golden.png"
+        alt="Gold Medal"
+        onError={(e) => {
+          if (!e.target.src.includes('/assets/medals/Golden.png')) {
+            e.target.src = '/assets/medals/Golden.png';
+          }
+        }}
+        style={{
+          width: 'clamp(32px, 4.4vh, 44px)',
+          height: 'clamp(32px, 4.4vh, 44px)',
+          objectFit: 'contain',
+          filter: selected
+            ? 'drop-shadow(0 0 14px rgba(245, 184, 56, 0.95)) drop-shadow(0 3px 6px rgba(0,0,0,0.6))'
+            : 'drop-shadow(0 2px 5px rgba(0,0,0,0.45))',
+          transform: selected ? 'scale(1.12)' : 'scale(1)',
+          transition: 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), filter 0.35s ease',
+          pointerEvents: 'none'
+        }}
+      />
+    ),
+    pillBg: 'linear-gradient(135deg, #FFE28A, #F5B838)',
+    pillColor: '#0B1430'
+  },
+  {
+    name: 'TITANIUM',
+    cleanName: 'TITANIUM',
+    targetIndex: 3,
+    symbol: '◆',
+    reward: 'International Sales Training Program at PRAGUE + 25K Reward points',
+    rewardBadge: 'PRAGUE + 25K',
+    subtitle: 'Prague + 25K',
+    validity: 'Oct – Dec',
+    pillLabel: 'PRAGUE + 25K',
+    color: '#93C5FD',
+    accentBorder: '#3B82F6',
+    inactiveBorder: 'rgba(59, 130, 246, 0.4)',
+    glowColor: 'rgba(59, 130, 246, 0.85)',
+    bgGradient: 'linear-gradient(180deg, rgba(59, 130, 246, 0.32) 0%, rgba(14, 24, 60, 0.98) 100%)',
+    renderIcon: (selected) => (
+      <img
+        src="./assets/medals/Titanium.png"
+        alt="Titanium Medal"
+        onError={(e) => {
+          if (!e.target.src.includes('/assets/medals/Titanium.png')) {
+            e.target.src = '/assets/medals/Titanium.png';
+          }
+        }}
+        style={{
+          width: 'clamp(32px, 4.4vh, 44px)',
+          height: 'clamp(32px, 4.4vh, 44px)',
+          objectFit: 'contain',
+          filter: selected
+            ? 'drop-shadow(0 0 14px rgba(59, 130, 246, 0.9)) drop-shadow(0 3px 6px rgba(0,0,0,0.6))'
+            : 'drop-shadow(0 2px 5px rgba(0,0,0,0.45))',
+          transform: selected ? 'scale(1.12)' : 'scale(1)',
+          transition: 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), filter 0.35s ease',
+          pointerEvents: 'none'
+        }}
+      />
+    ),
+    pillBg: 'linear-gradient(135deg, #93C5FD, #3B82F6)',
+    pillColor: '#0B1430'
+  },
+  {
+    name: 'PLATINUM',
+    cleanName: 'PLATINUM',
+    targetIndex: 4,
+    symbol: '★',
+    reward: 'International Sales Training Program at PRAGUE + 50K Reward points',
+    rewardBadge: 'PRAGUE + 50K',
+    subtitle: 'Prague + 50K',
+    validity: 'Oct – Dec',
+    pillLabel: 'PRAGUE + 50K',
+    color: '#C084FC',
+    accentBorder: '#A855F7',
+    inactiveBorder: 'rgba(168, 85, 247, 0.4)',
+    glowColor: 'rgba(168, 85, 247, 0.85)',
+    bgGradient: 'linear-gradient(180deg, rgba(168, 85, 247, 0.32) 0%, rgba(14, 24, 60, 0.98) 100%)',
+    renderIcon: (selected) => (
+      <img
+        src="./assets/medals/Platinum.png"
+        alt="Platinum Medal"
+        onError={(e) => {
+          if (!e.target.src.includes('/assets/medals/Platinum.png')) {
+            e.target.src = '/assets/medals/Platinum.png';
+          }
+        }}
+        style={{
+          width: 'clamp(32px, 4.4vh, 44px)',
+          height: 'clamp(32px, 4.4vh, 44px)',
+          objectFit: 'contain',
+          filter: selected
+            ? 'drop-shadow(0 0 14px rgba(168, 85, 247, 0.9)) drop-shadow(0 3px 6px rgba(0,0,0,0.6))'
+            : 'drop-shadow(0 2px 5px rgba(0,0,0,0.45))',
+          transform: selected ? 'scale(1.12)' : 'scale(1)',
+          transition: 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), filter 0.35s ease',
+          pointerEvents: 'none'
+        }}
+      />
+    ),
+    pillBg: 'linear-gradient(135deg, #E9D5FF, #A855F7)',
+    pillColor: '#0B1430'
+  }
+];
+
+export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, onNavigate, gameMode = 1, userRole = 'frontline' }) {
+  const isLeadership = userRole === 'leadership';
+  const tierConfigs = isLeadership ? LEADERSHIP_TIERS : FRONTLINE_TIERS;
+  const numTiers = tierConfigs.length;
+
+  const currentLane = LANES_DATA[selectedLane] || LANES_DATA[2];
   const targets = currentLane.t;
 
-  // Track which of the 5 milestone tier cards is selected (0: Bronze, 1: Silver, 2: Gold, 3: Titanium, 4: Platinum)
+  // Track which milestone tier card is selected
   const [selectedTierIndex, setSelectedTierIndex] = useState(() => {
     if (wap !== undefined && targets) {
-      const idx = targets.indexOf(wap);
+      const idx = tierConfigs.findIndex(t => targets[t.targetIndex] === wap);
       if (idx !== -1) return idx;
     }
-    return 4; // Default to Platinum
+    return numTiers - 1; // Default to Platinum (last tier)
   });
 
+  const currentTier = tierConfigs[selectedTierIndex] || tierConfigs[numTiers - 1];
+  const currentTargetVal = targets ? targets[currentTier.targetIndex] : 0;
+
+  // Keep target value in sync with selected tier & lane
+  useEffect(() => {
+    if (setWap && targets && targets[currentTier.targetIndex] !== undefined) {
+      setWap(targets[currentTier.targetIndex]);
+    }
+  }, [selectedTierIndex, selectedLane, userRole]);
+
+  // When userRole changes, adjust selectedTierIndex if it exceeds the tier range
+  useEffect(() => {
+    setSelectedTierIndex((prev) => Math.min(prev, numTiers - 1));
+  }, [userRole, numTiers]);
+
   // Onboarding hand gesture tutorial state (👆 emoji)
+  const tutorialStartPos = isLeadership ? 2 : 4;
+  const tutorialTargetPos = isLeadership ? 0 : 2;
+
   const [showTutorialHand, setShowTutorialHand] = useState(true);
-  const [tutorialHandPos, setTutorialHandPos] = useState(4); // Start at Platinum (index 4)
+  const [tutorialHandPos, setTutorialHandPos] = useState(tutorialStartPos);
   const [handTapping, setHandTapping] = useState(false);
   const [handFading, setHandFading] = useState(false);
   const userInteractedRef = useRef(false);
@@ -431,18 +582,19 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
     };
 
     // Onboarding gesture animation sequence:
-    // 1. Starts on Platinum (pos 4)
-    // 2. Glides smoothly to Gold (pos 2)
+    // 1. Starts on Platinum
+    // 2. Glides smoothly to Gold
     addTimeout(() => {
-      setTutorialHandPos(2);
+      setTutorialHandPos(tutorialTargetPos);
     }, 1000);
 
     // 3. Reaches Gold, taps, selects Gold, updates number
     addTimeout(() => {
       setHandTapping(true);
-      setSelectedTierIndex(2);
-      if (setWap && targetsRef.current && targetsRef.current[2] !== undefined) {
-        setWap(targetsRef.current[2]);
+      setSelectedTierIndex(tutorialTargetPos);
+      const tier = tierConfigs[tutorialTargetPos];
+      if (setWap && targetsRef.current && targetsRef.current[tier.targetIndex] !== undefined) {
+        setWap(targetsRef.current[tier.targetIndex]);
       }
       sound.play('click');
     }, 1650);
@@ -452,17 +604,18 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
       setHandTapping(false);
     }, 2100);
 
-    // 5. Glides smoothly back to Platinum (pos 4)
+    // 5. Glides smoothly back to Platinum
     addTimeout(() => {
-      setTutorialHandPos(4);
+      setTutorialHandPos(tutorialStartPos);
     }, 2900);
 
     // 6. Reaches Platinum, taps, selects Platinum, updates number back
     addTimeout(() => {
       setHandTapping(true);
-      setSelectedTierIndex(4);
-      if (setWap && targetsRef.current && targetsRef.current[4] !== undefined) {
-        setWap(targetsRef.current[4]);
+      setSelectedTierIndex(tutorialStartPos);
+      const tier = tierConfigs[tutorialStartPos];
+      if (setWap && targetsRef.current && targetsRef.current[tier.targetIndex] !== undefined) {
+        setWap(targetsRef.current[tier.targetIndex]);
       }
       sound.play('click');
     }, 3550);
@@ -486,7 +639,7 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
       timeoutsRef.current.forEach(clearTimeout);
       timeoutsRef.current = [];
     };
-  }, [setWap]);
+  }, [setWap, tutorialStartPos, tutorialTargetPos]);
 
   const handleSelect = (index) => {
     cancelTutorial();
@@ -494,19 +647,21 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
     onSelectLane(index);
     if (setWap) {
       const nextTargets = LANES_DATA[index]?.t;
-      if (nextTargets && nextTargets[selectedTierIndex] !== undefined) {
-        setWap(nextTargets[selectedTierIndex]);
+      const tier = tierConfigs[selectedTierIndex] || tierConfigs[0];
+      if (nextTargets && nextTargets[tier.targetIndex] !== undefined) {
+        setWap(nextTargets[tier.targetIndex]);
       }
     }
   };
 
-  const handleTierSelect = (targetIdx) => {
+  const handleTierSelect = (idx) => {
     cancelTutorial();
-    if (targetIdx === selectedTierIndex) return;
+    if (idx === selectedTierIndex) return;
     sound.play('click');
-    setSelectedTierIndex(targetIdx);
-    if (setWap && targets[targetIdx] !== undefined) {
-      setWap(targets[targetIdx]);
+    setSelectedTierIndex(idx);
+    const tier = tierConfigs[idx];
+    if (setWap && targets && targets[tier.targetIndex] !== undefined) {
+      setWap(targets[tier.targetIndex]);
     }
   };
 
@@ -631,13 +786,13 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
               top: 'clamp(5px, 0.9vh, 9px)',
               bottom: 'clamp(5px, 0.9vh, 9px)',
               left: 'clamp(3px, 0.8vw, 6px)',
-              width: 'calc((100% - 2 * clamp(3px, 0.8vw, 6px)) / 5)',
+              width: `calc((100% - 2 * clamp(3px, 0.8vw, 6px)) / ${numTiers})`,
               transform: `translateX(${selectedTierIndex * 100}%)`,
-              background: TIER_CONFIGS[selectedTierIndex].bgGradient,
-              border: `1.5px solid ${TIER_CONFIGS[selectedTierIndex].accentBorder}`,
+              background: currentTier.bgGradient,
+              border: `1.5px solid ${currentTier.accentBorder}`,
               borderRadius: 'clamp(10px, 1.4vh, 14px)',
-              boxShadow: `0 0 18px ${TIER_CONFIGS[selectedTierIndex].glowColor}, 0 6px 16px rgba(0,0,0,0.55)`,
-              animation: selectedTierIndex === 2 ? 'goldTierPulse 2.4s ease-in-out infinite' : (selectedTierIndex === 3 ? 'titaniumTierPulse 2.4s ease-in-out infinite' : (selectedTierIndex === 4 ? 'platinumTierPulse 2.4s ease-in-out infinite' : 'none')),
+              boxShadow: `0 0 18px ${currentTier.glowColor}, 0 6px 16px rgba(0,0,0,0.55)`,
+              animation: currentTier.cleanName === 'GOLD' ? 'goldTierPulse 2.4s ease-in-out infinite' : (currentTier.cleanName === 'TITANIUM' ? 'titaniumTierPulse 2.4s ease-in-out infinite' : (currentTier.cleanName === 'PLATINUM' ? 'platinumTierPulse 2.4s ease-in-out infinite' : 'none')),
               transition: 'transform 0.4s cubic-bezier(0.25, 1, 0.35, 1), background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease',
               pointerEvents: 'none',
               zIndex: 1,
@@ -645,7 +800,7 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
             }}
           >
             {/* Subtle Shimmer Sweep Reflection for Prague Tiers (Gold, Titanium, Platinum) */}
-            {selectedTierIndex >= 2 && (
+            {(currentTier.cleanName === 'GOLD' || currentTier.cleanName === 'TITANIUM' || currentTier.cleanName === 'PLATINUM') && (
               <div style={{
                 position: 'absolute',
                 top: 0,
@@ -665,7 +820,7 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
                 position: 'absolute',
                 bottom: 'clamp(-28px, -3.8vh, -20px)',
                 left: 'clamp(3px, 0.8vw, 6px)',
-                width: 'calc((100% - 2 * clamp(3px, 0.8vw, 6px)) / 5)',
+                width: `calc((100% - 2 * clamp(3px, 0.8vw, 6px)) / ${numTiers})`,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -692,10 +847,10 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
             </div>
           )}
 
-          {/* 5 Medal Interactive Items */}
-          {TIER_CONFIGS.map((tier, idx) => {
+          {/* Medal Interactive Items (5 for Frontline RM, 3 for Leadership) */}
+          {tierConfigs.map((tier, idx) => {
             const isSelected = idx === selectedTierIndex;
-            const targetVal = targets[idx];
+            const targetVal = targets ? targets[tier.targetIndex] : 0;
 
             return (
               <div
@@ -736,7 +891,7 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
                 <span style={{
                   position: 'relative',
                   zIndex: 2,
-                  fontSize: 'clamp(9px, 1.25vh, 12px)',
+                  fontSize: isLeadership ? 'clamp(10.5px, 1.45vh, 13.5px)' : 'clamp(9px, 1.25vh, 12px)',
                   fontWeight: 900,
                   color: isSelected ? tier.color : '#94A3B8',
                   letterSpacing: '0.06em',
@@ -763,8 +918,8 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
                   <AnimatedCount value={targetVal} />
                 </div>
 
-                {/* Validity Indication (Clear, unboxed, bold text) */}
-                {idx === 0 && (
+                {/* Validity Indication */}
+                {tier.name === 'BRONZE' && (
                   <span style={{
                     position: 'relative',
                     zIndex: 2,
@@ -781,7 +936,7 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
                   </span>
                 )}
 
-                {idx === 1 && (
+                {tier.name === 'SILVER' && (
                   <span style={{
                     position: 'relative',
                     zIndex: 2,
@@ -802,12 +957,12 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
                   </span>
                 )}
 
-                {idx >= 2 && (
+                {tier.name !== 'BRONZE' && tier.name !== 'SILVER' && (
                   <span style={{
                     position: 'relative',
                     zIndex: 2,
                     marginTop: 'clamp(2px, 0.4vh, 4px)',
-                    fontSize: 'clamp(9.5px, 1.3vh, 12px)',
+                    fontSize: isLeadership ? 'clamp(10px, 1.35vh, 12.5px)' : 'clamp(9.5px, 1.3vh, 12px)',
                     fontWeight: 900,
                     letterSpacing: '0.02em',
                     color: isSelected ? '#FFFFFF' : '#94A3B8',
@@ -829,7 +984,7 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
         <div style={{
           background: 'linear-gradient(135deg, rgba(14, 26, 68, 0.96) 0%, rgba(8, 14, 40, 0.98) 100%)',
           border: '1.5px solid rgba(233, 185, 73, 0.6)',
-          borderRadius: 'clamp(14px, 2vh, 20px)',
+          borderRadius: 'clamp(8px, 1.2vh, 12px)',
           padding: 'clamp(11px, 1.6vh, 16px) clamp(13px, 3.2vw, 19px)',
           display: 'flex',
           flexDirection: 'column',
@@ -876,7 +1031,7 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
               letterSpacing: '0.06em',
               textTransform: 'uppercase'
             }}>
-              {selectedTierIndex === 2 ? 'PRAGUE THRESHOLD' : `${TIER_CONFIGS[selectedTierIndex].cleanName} TARGET`}
+              {currentTier.cleanName === 'GOLD' ? 'PRAGUE THRESHOLD' : `${currentTier.cleanName} TARGET`}
             </span>
             <span style={{
               fontFamily: "'Plus Jakarta Sans', sans-serif",
@@ -894,7 +1049,7 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
               letterSpacing: '0.01em',
               textShadow: '0 0 10px rgba(245, 184, 56, 0.35)'
             }}>
-              <AnimatedCount value={targets[selectedTierIndex]} prefix="₹" suffix=" Lakh" />
+              <AnimatedCount value={currentTargetVal} prefix="₹" suffix=" Lakh" />
             </span>
           </div>
 
@@ -912,40 +1067,108 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
           }}>
             <span style={{
               fontFamily: "'Plus Jakarta Sans', sans-serif",
-              fontSize: 'clamp(15px, 2vh, 18.5px)',
+              fontSize: 'clamp(14px, 1.9vh, 17.5px)',
               fontWeight: 900,
-              color: TIER_CONFIGS[selectedTierIndex].color,
+              color: currentTier.color,
               letterSpacing: '0.02em',
               textShadow: '0 2px 8px rgba(0,0,0,0.5)'
             }}>
-              {TIER_CONFIGS[selectedTierIndex].reward}
+              {currentTier.reward}
             </span>
 
-            {/* Prominent Indication for Bronze & Silver without emoji or underline */}
-            {selectedTierIndex === 0 && (
-              <span style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                fontSize: 'clamp(13px, 1.75vh, 15.5px)',
-                fontWeight: 800,
-                color: '#FDE68A',
-                letterSpacing: '0.02em',
-                textShadow: '0 1px 4px rgba(0,0,0,0.7)'
-              }}>
-                Applicable for <span style={{ color: '#F59E0B', fontWeight: 900 }}>October only</span>
-              </span>
+            {/* Prominent Glowing & Shining Indication for Bronze & Silver (Frontline only) */}
+            {!isLeadership && currentTier.cleanName === 'BRONZE' && (
+              <div
+                style={{
+                  position: 'relative',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.24) 0%, rgba(180, 83, 9, 0.4) 100%)',
+                  border: '1.5px solid #F59E0B',
+                  borderRadius: '8px',
+                  padding: 'clamp(4px, 0.6vh, 6px) clamp(12px, 2.8vw, 16px)',
+                  marginTop: 'clamp(2px, 0.4vh, 5px)',
+                  overflow: 'hidden',
+                  animation: 'applicablePulseBronze 2s ease-in-out infinite alternate',
+                  boxShadow: '0 0 16px rgba(245, 158, 11, 0.65), 0 0 30px rgba(245, 158, 11, 0.3)'
+                }}
+              >
+                {/* Moving Light Shimmer Streak */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    width: '45%',
+                    background: 'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0) 100%)',
+                    transform: 'skewX(-20deg)',
+                    animation: 'goldBtnShine 2.5s infinite',
+                    pointerEvents: 'none'
+                  }}
+                />
+                <span
+                  style={{
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontSize: 'clamp(12px, 1.65vh, 14.5px)',
+                    fontWeight: 900,
+                    color: '#FFFBEB',
+                    letterSpacing: '0.03em',
+                    textShadow: '0 0 10px rgba(245, 158, 11, 0.85), 0 1px 3px rgba(0,0,0,0.85)',
+                    position: 'relative',
+                    zIndex: 1
+                  }}
+                >
+                  Applicable for <span style={{ color: '#FDE047', fontWeight: 900 }}>October only</span>
+                </span>
+              </div>
             )}
 
-            {selectedTierIndex === 1 && (
-              <span style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                fontSize: 'clamp(13px, 1.75vh, 15.5px)',
-                fontWeight: 800,
-                color: '#FFFFFF',
-                letterSpacing: '0.02em',
-                textShadow: '0 1px 4px rgba(0,0,0,0.7)'
-              }}>
-                Applicable for <span style={{ color: '#CBD5E1', fontWeight: 900 }}>October + November only</span>
-              </span>
+            {!isLeadership && currentTier.cleanName === 'SILVER' && (
+              <div
+                style={{
+                  position: 'relative',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'linear-gradient(135deg, rgba(226, 232, 240, 0.22) 0%, rgba(148, 163, 184, 0.35) 100%)',
+                  border: '1.5px solid #E2E8F0',
+                  borderRadius: '8px',
+                  padding: 'clamp(4px, 0.6vh, 6px) clamp(12px, 2.8vw, 16px)',
+                  marginTop: 'clamp(2px, 0.4vh, 5px)',
+                  overflow: 'hidden',
+                  animation: 'applicablePulseSilver 2s ease-in-out infinite alternate',
+                  boxShadow: '0 0 16px rgba(226, 232, 240, 0.65), 0 0 30px rgba(226, 232, 240, 0.3)'
+                }}
+              >
+                {/* Moving Light Shimmer Streak */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    width: '45%',
+                    background: 'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0) 100%)',
+                    transform: 'skewX(-20deg)',
+                    animation: 'goldBtnShine 2.5s infinite',
+                    pointerEvents: 'none'
+                  }}
+                />
+                <span
+                  style={{
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontSize: 'clamp(12px, 1.65vh, 14.5px)',
+                    fontWeight: 900,
+                    color: '#FFFFFF',
+                    letterSpacing: '0.03em',
+                    textShadow: '0 0 10px rgba(226, 232, 240, 0.85), 0 1px 3px rgba(0,0,0,0.85)',
+                    position: 'relative',
+                    zIndex: 1
+                  }}
+                >
+                  Applicable for <span style={{ color: '#F8FAFC', fontWeight: 900 }}>October + November only</span>
+                </span>
+              </div>
             )}
           </div>
         </div>
@@ -957,7 +1180,7 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
           background: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(18px)',
           border: '1.5px solid rgba(255, 255, 255, 0.9)',
-          borderRadius: 'clamp(14px, 2vh, 20px)',
+          borderRadius: 'clamp(10px, 1.4vh, 14px)',
           padding: 'clamp(7px, 1.2vh, 14px) clamp(8px, 2.2vw, 14px) clamp(6px, 1vh, 12px)',
           boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)',
           display: 'flex',
@@ -1069,7 +1292,7 @@ export default function LaneScreen({ selectedLane, onSelectLane, wap, setWap, on
             type="button"
             onClick={() => {
               sound.play('click');
-              if (setWap) setWap(targets[selectedTierIndex] || 0);
+              if (setWap) setWap(currentTargetVal || 0);
               onNavigate(gameMode === 1 ? 'rules' : 'journey');
             }}
             style={{

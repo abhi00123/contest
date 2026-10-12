@@ -5,6 +5,7 @@ const GAME_IMAGE_ASSETS = [
   './assets/Prague Winners International Training Poster.png',
   './assets/prague_bg.jpg',
   './assets/Prague_Golden_Travel_Stamp.png',
+  './assets/PP.png',
   './assets/medals/Bronze.png',
   './assets/medals/Silver.png',
   './assets/medals/Golden.png',
