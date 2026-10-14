@@ -1494,7 +1494,7 @@ export default function LaneScreen({
               {/* 1. Main Dropdown (Always visible first) */}
               <SearchableDropdown
                 stepNumber="1"
-                stepLabel="Leadership Role / Sheet"
+                stepLabel="Leadership Role"
                 placeholder="Select Role Category (BM, ZH_CH_TPP, etc.)..."
                 searchPlaceholder="Search role category..."
                 options={sheetDropdownOptions}
@@ -1511,9 +1511,9 @@ export default function LaneScreen({
               {selectedSheetObj && selectedSheetObj.hasSubRole && (
                 <SearchableDropdown
                   stepNumber="2"
-                  stepLabel="Select Designation / Sub-Role"
-                  placeholder={selectedSheetObj.subRolePlaceholder || 'Select Sub-Role...'}
-                  searchPlaceholder="Search sub-role..."
+                  stepLabel="Select Designation"
+                  placeholder={selectedSheetObj.subRolePlaceholder || 'Select Designation...'}
+                  searchPlaceholder="Search designation..."
                   options={subRoleDropdownOptions}
                   selectedValue={activeLeadership.subRoleKey}
                   onSelect={handleSelectSubRole}
