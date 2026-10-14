@@ -1,9 +1,367 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { LANES_DATA } from '../data/contestData';
+import { LEADERSHIP_SHEETS } from '../data/leadershipData';
 import { sound } from '../utils/sound';
 
+// Helper to format target values in Lakhs (< 100) or Crores (>= 100)
+function formatTargetUnit(valInLakhs, fullWord = false) {
+  const num = Number(valInLakhs) || 0;
+  if (num >= 100) {
+    const crVal = Math.round((num / 100) * 100) / 100;
+    return {
+      val: crVal,
+      suffix: fullWord ? ' Cr' : 'Cr'
+    };
+  }
+  return {
+    val: num,
+    suffix: fullWord ? ' Lakh' : 'L'
+  };
+}
+
+// Custom Searchable Dropdown for Leadership Role cascading selection
+function SearchableDropdown({
+  stepNumber,
+  stepLabel,
+  placeholder,
+  searchPlaceholder = 'Type to search...',
+  options = [],
+  selectedValue,
+  onSelect,
+  isOpen,
+  onToggle,
+  onClose
+}) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const containerRef = useRef(null);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setSearchTerm('');
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 30);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleClickOutside = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        onClose();
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isOpen, onClose]);
+
+  const selectedOption = useMemo(
+    () => options.find((o) => o.value === selectedValue) || null,
+    [options, selectedValue]
+  );
+
+  const filteredOptions = useMemo(() => {
+    const q = searchTerm.trim().toLowerCase();
+    if (!q) return options;
+    return options.filter((o) => {
+      const matchLabel = o.label?.toLowerCase().includes(q);
+      const matchSub = o.sub?.toLowerCase().includes(q);
+      const matchCode = o.code?.toLowerCase().includes(q);
+      const matchEmp = o.empId?.toLowerCase().includes(q);
+      return matchLabel || matchSub || matchCode || matchEmp;
+    });
+  }, [options, searchTerm]);
+
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        position: 'relative',
+        width: '100%',
+        zIndex: isOpen ? 70 : 1
+      }}
+    >
+      {stepLabel && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            marginBottom: 4,
+            paddingLeft: 2
+          }}
+        >
+          <span
+            style={{
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              fontSize: 'clamp(10px, 1.32vh, 12px)',
+              fontWeight: 800,
+              color: selectedOption ? '#FDE68A' : '#7DD3FC',
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase'
+            }}
+          >
+            {stepNumber ? `${stepNumber}. ${stepLabel}` : stepLabel}
+          </span>
+        </div>
+      )}
+
+      {/* Trigger Button */}
+      <button
+        type="button"
+        onClick={onToggle}
+        style={{
+          width: '100%',
+          minHeight: 'clamp(44px, 6vh, 54px)',
+          borderRadius: 'clamp(10px, 1.4vh, 14px)',
+          border: isOpen
+            ? '2px solid #FFE28A'
+            : selectedOption
+            ? '1.5px solid rgba(245, 184, 56, 0.85)'
+            : '1.5px solid rgba(56, 189, 248, 0.6)',
+          background: isOpen
+            ? 'linear-gradient(135deg, #1E3A8A 0%, #0F1E4E 100%)'
+            : selectedOption
+            ? 'linear-gradient(135deg, rgba(30, 58, 138, 0.88) 0%, rgba(13, 25, 66, 0.96) 100%)'
+            : 'linear-gradient(135deg, rgba(20, 39, 94, 0.78) 0%, rgba(10, 20, 52, 0.92) 100%)',
+          color: '#FFFFFF',
+          padding: 'clamp(8px, 1.15vh, 12px) clamp(12px, 2.5vw, 16px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 10,
+          cursor: 'pointer',
+          boxShadow: isOpen
+            ? '0 0 20px rgba(245, 184, 56, 0.55), 0 6px 16px rgba(0,0,0,0.45)'
+            : selectedOption
+            ? '0 0 14px rgba(245, 184, 56, 0.28), 0 4px 10px rgba(0,0,0,0.35)'
+            : '0 0 12px rgba(56, 189, 248, 0.18), 0 4px 10px rgba(0,0,0,0.3)',
+          transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+          textAlign: 'left',
+          boxSizing: 'border-box'
+        }}
+      >
+        <span
+          style={{
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontSize: 'clamp(13.5px, 1.85vh, 16px)',
+            fontWeight: selectedOption ? 800 : 700,
+            color: selectedOption ? '#FFFFFF' : '#BAE6FD',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            letterSpacing: '0.01em',
+            flex: 1,
+            minWidth: 0
+          }}
+        >
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+
+        {/* Clean Chevron Icon (No Circle) */}
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke={selectedOption ? '#FFE28A' : '#7DD3FC'}
+          strokeWidth="2.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{
+            flexShrink: 0,
+            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 0.22s ease'
+          }}
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+
+      {/* Floating Searchable Popover Panel (Opens Upwards with generous height) */}
+      {isOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 'calc(100% + 8px)',
+            left: 0,
+            right: 0,
+            background: 'linear-gradient(180deg, #102052 0%, #091232 100%)',
+            border: '2px solid #F5B838',
+            borderRadius: '16px',
+            boxShadow: '0 20px 48px rgba(0, 0, 0, 0.85), 0 0 28px rgba(245, 184, 56, 0.38)',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            zIndex: 100,
+            animation: 'screenFadeIn 0.18s ease-out'
+          }}
+        >
+          {/* Sticky Search Input Header */}
+          <div
+            style={{
+              padding: '11px 14px',
+              background: 'linear-gradient(90deg, #162B6B 0%, #102052 100%)',
+              borderBottom: '1.5px solid rgba(245, 184, 56, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 9
+            }}
+          >
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#FFE28A"
+              strokeWidth="2.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ flexShrink: 0 }}
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+
+            <input
+              ref={inputRef}
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  e.stopPropagation();
+                  onClose();
+                } else if (e.key === 'Enter' && filteredOptions.length > 0) {
+                  e.preventDefault();
+                  onSelect(filteredOptions[0].value);
+                }
+              }}
+              placeholder={searchPlaceholder}
+              style={{
+                flex: 1,
+                background: 'transparent',
+                border: 'none',
+                outline: 'none',
+                color: '#FFFFFF',
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: '14.5px',
+                fontWeight: 700,
+                minWidth: 0
+              }}
+            />
+
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchTerm('');
+                  if (inputRef.current) inputRef.current.focus();
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#FFE28A',
+                  fontSize: '13px',
+                  fontWeight: 900,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '0 2px',
+                  flexShrink: 0
+                }}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          {/* Options Scroll List - Clean Flat List (No Individual Boxes) */}
+          <div
+            style={{
+              maxHeight: 'clamp(240px, 34vh, 310px)',
+              overflowY: 'auto',
+              padding: '4px 0',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            {filteredOptions.length === 0 ? (
+              <div
+                style={{
+                  padding: '22px 14px',
+                  textAlign: 'center',
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  fontSize: '13.5px',
+                  fontWeight: 700,
+                  color: '#94A3B8'
+                }}
+              >
+                No matching results for "{searchTerm}"
+              </div>
+            ) : (
+              filteredOptions.map((opt, idx) => {
+                const isSelected = opt.value === selectedValue;
+                const isLast = idx === filteredOptions.length - 1;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => onSelect(opt.value)}
+                    style={{
+                      width: '100%',
+                      padding: '11px 16px',
+                      borderRadius: 0,
+                      border: 'none',
+                      borderBottom: isLast ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
+                      background: isSelected
+                        ? 'rgba(245, 184, 56, 0.18)'
+                        : 'transparent',
+                      color: '#FFFFFF',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-start',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      boxSizing: 'border-box',
+                      transition: 'background 0.12s ease'
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        fontSize: '14.5px',
+                        fontWeight: isSelected ? 900 : 700,
+                        color: isSelected ? '#FFE28A' : '#FFFFFF',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        width: '100%'
+                      }}
+                    >
+                      {opt.label}
+                    </span>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // Animated counting number component for dynamic target numbers
-function AnimatedCount({ value, prefix = '', suffix = 'L', duration = 360 }) {
+function AnimatedCount({ value, prefix = '', suffix = 'L', duration = 360, formatCommas = false }) {
   const [currentVal, setCurrentVal] = useState(value);
   const prevValRef = useRef(value);
 
@@ -41,9 +399,13 @@ function AnimatedCount({ value, prefix = '', suffix = 'L', duration = 360 }) {
     return () => cancelAnimationFrame(animId);
   }, [value, duration]);
 
+  const displayVal = formatCommas
+    ? Math.round(Number(currentVal) || 0).toLocaleString('en-IN')
+    : currentVal;
+
   return (
     <span>
-      {prefix}{currentVal}<span style={{ fontSize: '0.65em', opacity: 0.9, marginLeft: 1 }}>{suffix}</span>
+      {prefix}{displayVal}{suffix ? <span style={{ fontSize: '0.65em', opacity: 0.9, marginLeft: 1 }}>{suffix}</span> : null}
     </span>
   );
 }
@@ -149,19 +511,124 @@ export default function LaneScreen({
   wap,
   setWap,
   onNavigate,
-  userRole = 'frontline'
+  userRole = 'frontline',
+  leadershipSelection,
+  onUpdateLeadership
 }) {
   const isLeadership = userRole === 'leadership';
   const tierConfigs = isLeadership ? LEADERSHIP_TIERS : FRONTLINE_TIERS;
   const numTiers = tierConfigs.length;
 
+  // Leadership selection state (uses lifted state from App if provided)
+  const [localLeadership, setLocalLeadership] = useState({
+    sheetKey: '',
+    subRoleKey: '',
+    itemId: ''
+  });
+  const activeLeadership = leadershipSelection || localLeadership;
+  const updateLeadership = onUpdateLeadership || setLocalLeadership;
+
+  // Which dropdown is currently open: 'sheet' | 'subRole' | 'item' | null
+  const [openDropdown, setOpenDropdown] = useState(null);
+
+  const selectedSheetObj = useMemo(
+    () => LEADERSHIP_SHEETS.find((s) => s.key === activeLeadership.sheetKey) || null,
+    [activeLeadership.sheetKey]
+  );
+
+  const selectedSubRoleObj = useMemo(() => {
+    if (!selectedSheetObj || !selectedSheetObj.hasSubRole) return null;
+    return (
+      selectedSheetObj.subRoles.find((sr) => sr.key === activeLeadership.subRoleKey) || null
+    );
+  }, [selectedSheetObj, activeLeadership.subRoleKey]);
+
+  const activeItemsList = useMemo(() => {
+    if (!selectedSheetObj) return [];
+    if (selectedSheetObj.hasSubRole) {
+      return selectedSubRoleObj ? selectedSubRoleObj.items : [];
+    }
+    return selectedSheetObj.items || [];
+  }, [selectedSheetObj, selectedSubRoleObj]);
+
+  const selectedLeadershipItem = useMemo(
+    () => activeItemsList.find((item) => item.id === activeLeadership.itemId) || null,
+    [activeItemsList, activeLeadership.itemId]
+  );
+
   const currentLane = LANES_DATA[selectedLane] || LANES_DATA[2];
-  const targets = currentLane.t;
+
+  const targets = useMemo(() => {
+    if (!isLeadership) {
+      return currentLane.t;
+    }
+    if (selectedLeadershipItem) {
+      return [
+        0,
+        0,
+        selectedLeadershipItem.gold,
+        selectedLeadershipItem.titanium,
+        selectedLeadershipItem.platinum
+      ];
+    }
+    return [0, 0, 0, 0, 0];
+  }, [isLeadership, currentLane.t, selectedLeadershipItem]);
+
+  const rawTargets = useMemo(() => {
+    if (!isLeadership || !selectedLeadershipItem) {
+      return [0, 0, 0, 0, 0];
+    }
+    return [
+      0,
+      0,
+      selectedLeadershipItem.goldRaw,
+      selectedLeadershipItem.titaniumRaw,
+      selectedLeadershipItem.platinumRaw
+    ];
+  }, [isLeadership, selectedLeadershipItem]);
+
+  const selectedRoleTitle = useMemo(() => {
+    if (!isLeadership) return currentLane.full;
+    if (selectedLeadershipItem) {
+      const rolePrefix = selectedSubRoleObj ? selectedSubRoleObj.label : selectedSheetObj?.label;
+      return `${rolePrefix} – ${selectedLeadershipItem.name}`;
+    }
+    if (selectedSubRoleObj) return `${selectedSheetObj.label} – ${selectedSubRoleObj.label}`;
+    if (selectedSheetObj) return selectedSheetObj.label;
+    return 'Select Your Leadership Role Below';
+  }, [isLeadership, currentLane.full, selectedLeadershipItem, selectedSubRoleObj, selectedSheetObj]);
+
+  // Options formatted for SearchableDropdown (clean names only, no numbers or right-side badges)
+  const sheetDropdownOptions = useMemo(
+    () =>
+      LEADERSHIP_SHEETS.map((s) => ({
+        value: s.key,
+        label: s.label
+      })),
+    []
+  );
+
+  const subRoleDropdownOptions = useMemo(() => {
+    if (!selectedSheetObj || !selectedSheetObj.hasSubRole) return [];
+    return selectedSheetObj.subRoles.map((sr) => ({
+      value: sr.key,
+      label: sr.label
+    }));
+  }, [selectedSheetObj]);
+
+  const itemDropdownOptions = useMemo(
+    () =>
+      activeItemsList.map((item) => ({
+        value: item.id,
+        label: item.name
+      })),
+    [activeItemsList]
+  );
 
   // Track which milestone tier card is selected
   const [selectedTierIndex, setSelectedTierIndex] = useState(() => {
     if (wap !== undefined && targets) {
-      const idx = tierConfigs.findIndex((t) => targets[t.targetIndex] === wap);
+      const idx = tierConfigs.findIndex((t) => targets[t.targetIndex] === wap && wap > 0);
       if (idx !== -1) return idx;
     }
     return numTiers - 1; // Default to Platinum
@@ -169,6 +636,7 @@ export default function LaneScreen({
 
   const currentTier = tierConfigs[selectedTierIndex] || tierConfigs[numTiers - 1];
   const currentTargetVal = targets ? targets[currentTier.targetIndex] : 0;
+  const currentRawTargetVal = rawTargets ? rawTargets[currentTier.targetIndex] : 0;
 
   // Keep target value in sync with selected tier & lane
   useEffect(() => {
@@ -274,6 +742,39 @@ export default function LaneScreen({
     if (setWap && targets && targets[tier.targetIndex] !== undefined) {
       setWap(targets[tier.targetIndex]);
     }
+  };
+
+  // Handlers for Leadership cascading dropdowns
+  const handleSelectSheet = (sheetKey) => {
+    cancelTutorial();
+    sound.play('click');
+    updateLeadership({
+      sheetKey,
+      subRoleKey: '',
+      itemId: ''
+    });
+    setOpenDropdown(null);
+  };
+
+  const handleSelectSubRole = (subRoleKey) => {
+    cancelTutorial();
+    sound.play('click');
+    updateLeadership((prev) => ({
+      ...prev,
+      subRoleKey,
+      itemId: ''
+    }));
+    setOpenDropdown(null);
+  };
+
+  const handleSelectLeadershipItem = (itemId) => {
+    cancelTutorial();
+    sound.play('click');
+    updateLeadership((prev) => ({
+      ...prev,
+      itemId
+    }));
+    setOpenDropdown(null);
   };
 
   return (
@@ -531,7 +1032,7 @@ export default function LaneScreen({
                   {tier.name}
                 </span>
 
-                {/* Target Value with Animated Count */}
+                {/* Target Value with Animated Count (Automatically in Cr if >= 100L) */}
                 <div
                   style={{
                     position: 'relative',
@@ -546,7 +1047,10 @@ export default function LaneScreen({
                     transition: 'all 0.35s ease'
                   }}
                 >
-                  <AnimatedCount value={targetVal} />
+                  <AnimatedCount
+                    value={formatTargetUnit(targetVal, false).val}
+                    suffix={formatTargetUnit(targetVal, false).suffix}
+                  />
                 </div>
 
                 {/* Validity Indication */}
@@ -658,7 +1162,7 @@ export default function LaneScreen({
                 lineHeight: 1.25
               }}
             >
-              {currentLane.full}
+              {selectedRoleTitle}
             </span>
           </div>
 
@@ -704,7 +1208,20 @@ export default function LaneScreen({
                 textShadow: '0 0 10px rgba(245, 184, 56, 0.35)'
               }}
             >
-              <AnimatedCount value={currentTargetVal} prefix="₹" suffix=" Lakh" />
+              {isLeadership ? (
+                <AnimatedCount
+                  value={currentRawTargetVal}
+                  prefix="₹"
+                  suffix=""
+                  formatCommas={true}
+                />
+              ) : (
+                <AnimatedCount
+                  value={formatTargetUnit(currentTargetVal, true).val}
+                  prefix="₹"
+                  suffix={formatTargetUnit(currentTargetVal, true).suffix}
+                />
+              )}
             </span>
           </div>
 
@@ -833,120 +1350,215 @@ export default function LaneScreen({
         </div>
 
         {/* ============================================================== */}
-        {/* 3. FROSTED WHITE CARD: 10 ROLE CHIPS MATRIX                    */}
+        {/* 3. ROLE SELECTION CARD                                         */}
         {/* ============================================================== */}
         <div
           style={{
-            background: 'rgba(255, 255, 255, 0.95)',
+            background: isLeadership
+              ? 'linear-gradient(145deg, rgba(15, 28, 72, 0.96) 0%, rgba(8, 15, 42, 0.98) 100%)'
+              : 'rgba(255, 255, 255, 0.95)',
             backdropFilter: 'blur(18px)',
-            border: '1.5px solid rgba(255, 255, 255, 0.9)',
-            borderRadius: 'clamp(10px, 1.4vh, 14px)',
-            padding: 'clamp(7px, 1.2vh, 14px) clamp(8px, 2.2vw, 14px) clamp(6px, 1vh, 12px)',
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)',
+            border: isLeadership
+              ? '1.5px solid rgba(245, 184, 56, 0.65)'
+              : '1.5px solid rgba(255, 255, 255, 0.9)',
+            borderRadius: 'clamp(12px, 1.6vh, 16px)',
+            padding: isLeadership
+              ? 'clamp(11px, 1.6vh, 16px) clamp(12px, 2.8vw, 18px) clamp(12px, 1.7vh, 17px)'
+              : 'clamp(7px, 1.2vh, 14px) clamp(8px, 2.2vw, 14px) clamp(6px, 1vh, 12px)',
+            boxShadow: isLeadership
+              ? '0 10px 28px rgba(0, 0, 0, 0.6), 0 0 20px rgba(245, 184, 56, 0.2)'
+              : '0 8px 24px rgba(0, 0, 0, 0.35)',
             display: 'flex',
             flexDirection: 'column',
-            gap: 'clamp(4.5px, 0.8vh, 8px)',
-            zIndex: 2,
-            flexShrink: 0
+            gap: isLeadership ? 'clamp(8px, 1.2vh, 12px)' : 'clamp(4.5px, 0.8vh, 8px)',
+            zIndex: openDropdown ? 60 : 2,
+            flexShrink: 0,
+            position: 'relative'
           }}
         >
-          {/* Header inside White Card */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(5px, 0.8vw, 8px)', padding: '0 2px' }}>
+          {/* Header inside Role Card */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(6px, 1vw, 9px)', padding: '0 2px' }}>
             <div
               style={{
-                width: 'clamp(15px, 2vh, 19px)',
-                height: 'clamp(15px, 2vh, 19px)',
+                width: 'clamp(16px, 2.1vh, 20px)',
+                height: 'clamp(16px, 2.1vh, 20px)',
                 borderRadius: '50%',
-                background: '#EF4444',
-                border: '2px solid #FFFFFF',
+                background: isLeadership
+                  ? 'linear-gradient(135deg, #FFE28A 0%, #F5B838 100%)'
+                  : '#EF4444',
+                border: isLeadership ? '2px solid #FFFBEB' : '2px solid #FFFFFF',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.25)'
+                boxShadow: isLeadership
+                  ? '0 0 10px rgba(245, 184, 56, 0.7)'
+                  : '0 1px 4px rgba(0,0,0,0.25)'
               }}
             >
               <div
                 style={{
-                  width: 'clamp(4.5px, 0.6vh, 6px)',
-                  height: 'clamp(4.5px, 0.6vh, 6px)',
+                  width: 'clamp(5px, 0.65vh, 6.5px)',
+                  height: 'clamp(5px, 0.65vh, 6.5px)',
                   borderRadius: '50%',
-                  background: '#FFFFFF'
+                  background: isLeadership ? '#091232' : '#FFFFFF'
                 }}
               />
             </div>
             <span
               style={{
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
-                fontSize: 'clamp(10.5px, 1.4vh, 13.5px)',
+                fontSize: isLeadership ? 'clamp(11.5px, 1.5vh, 14px)' : 'clamp(10.5px, 1.4vh, 13.5px)',
                 fontWeight: 900,
-                letterSpacing: '0.04em',
-                color: '#0F172A',
-                textTransform: 'uppercase'
+                letterSpacing: '0.06em',
+                color: isLeadership ? '#FFE28A' : '#0F172A',
+                textTransform: 'uppercase',
+                textShadow: isLeadership ? '0 0 10px rgba(245, 184, 56, 0.35)' : 'none'
               }}
             >
               SELECT YOUR ROLE
             </span>
           </div>
 
-          {/* 10 Role Buttons (2 Columns × 5 Rows) */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: 'clamp(4px, 0.7vh, 7.5px)',
-              columnGap: 'clamp(4px, 1.2vw, 8px)',
-              width: '100%',
-              boxSizing: 'border-box'
-            }}
-          >
-            {LANES_DATA.map((lane, index) => {
-              const isSelected = index === selectedLane;
+          {!isLeadership ? (
+            /* Frontline RM: 10 Role Buttons (2 Columns × 5 Rows) */
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: 'clamp(4px, 0.7vh, 7.5px)',
+                columnGap: 'clamp(4px, 1.2vw, 8px)',
+                width: '100%',
+                boxSizing: 'border-box'
+              }}
+            >
+              {LANES_DATA.map((lane, index) => {
+                const isSelected = index === selectedLane;
 
-              return (
-                <button
-                  key={lane.label}
-                  type="button"
-                  onClick={() => handleSelect(index)}
-                  style={{
-                    height: 'clamp(34px, 4.9vh, 48px)',
-                    borderRadius: 'clamp(8px, 1.2vh, 12px)',
-                    border: isSelected ? '1.5px solid #E9B949' : '1px solid #DCE6F5',
-                    background: isSelected
-                      ? 'linear-gradient(135deg, #0B1536 0%, #15224D 100%)'
-                      : 'linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%)',
-                    color: isSelected ? '#FFFFFF' : '#0F172A',
-                    padding: '0 clamp(6px, 1.5vw, 10px)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    textAlign: 'center',
-                    cursor: 'pointer',
-                    boxShadow: isSelected
-                      ? '0 0 14px rgba(233, 185, 73, 0.45), 0 3px 8px rgba(0,0,0,0.25)'
-                      : '0 1px 4px rgba(15, 23, 42, 0.05)',
-                    transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
-                    position: 'relative',
-                    overflow: 'hidden'
-                  }}
-                >
-                  <span
+                return (
+                  <button
+                    key={lane.label}
+                    type="button"
+                    onClick={() => handleSelect(index)}
                     style={{
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                      fontSize: 'clamp(12px, 1.7vh, 15.5px)',
-                      fontWeight: 900,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
+                      height: 'clamp(34px, 4.9vh, 48px)',
+                      borderRadius: 'clamp(8px, 1.2vh, 12px)',
+                      border: isSelected ? '1.5px solid #E9B949' : '1px solid #DCE6F5',
+                      background: isSelected
+                        ? 'linear-gradient(135deg, #0B1536 0%, #15224D 100%)'
+                        : 'linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%)',
+                      color: isSelected ? '#FFFFFF' : '#0F172A',
+                      padding: '0 clamp(6px, 1.5vw, 10px)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                       textAlign: 'center',
-                      letterSpacing: '0.01em'
+                      cursor: 'pointer',
+                      boxShadow: isSelected
+                        ? '0 0 14px rgba(233, 185, 73, 0.45), 0 3px 8px rgba(0,0,0,0.25)'
+                        : '0 1px 4px rgba(15, 23, 42, 0.05)',
+                      transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
+                      position: 'relative',
+                      overflow: 'hidden'
                     }}
                   >
-                    {lane.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                    <span
+                      style={{
+                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        fontSize: 'clamp(12px, 1.7vh, 15.5px)',
+                        fontWeight: 900,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        textAlign: 'center',
+                        letterSpacing: '0.01em'
+                      }}
+                    >
+                      {lane.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            /* Leadership Role: Progressive Searchable Cascading Dropdowns */
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'clamp(8px, 1.25vh, 13px)',
+                width: '100%',
+                paddingTop: 2,
+                boxSizing: 'border-box'
+              }}
+            >
+              {/* 1. Main Dropdown (Always visible first) */}
+              <SearchableDropdown
+                stepNumber="1"
+                stepLabel="Leadership Role / Sheet"
+                placeholder="Select Role Category (BM, ZH_CH_TPP, etc.)..."
+                searchPlaceholder="Search role category..."
+                options={sheetDropdownOptions}
+                selectedValue={activeLeadership.sheetKey}
+                onSelect={handleSelectSheet}
+                isOpen={openDropdown === 'sheet'}
+                onToggle={() =>
+                  setOpenDropdown((prev) => (prev === 'sheet' ? null : 'sheet'))
+                }
+                onClose={() => setOpenDropdown(null)}
+              />
+
+              {/* 2A. Sub-Role Dropdown (Only if selected sheet has sub-roles, e.g. ZH_CH_TPP, Insignia AH, Signature AH, Corp Salary) */}
+              {selectedSheetObj && selectedSheetObj.hasSubRole && (
+                <SearchableDropdown
+                  stepNumber="2"
+                  stepLabel="Select Designation / Sub-Role"
+                  placeholder={selectedSheetObj.subRolePlaceholder || 'Select Sub-Role...'}
+                  searchPlaceholder="Search sub-role..."
+                  options={subRoleDropdownOptions}
+                  selectedValue={activeLeadership.subRoleKey}
+                  onSelect={handleSelectSubRole}
+                  isOpen={openDropdown === 'subRole'}
+                  onToggle={() =>
+                    setOpenDropdown((prev) => (prev === 'subRole' ? null : 'subRole'))
+                  }
+                  onClose={() => setOpenDropdown(null)}
+                />
+              )}
+
+              {/* 2B / 3. Branch or Name Dropdown (Appears directly for BM & PCAM AH, or after Sub-Role is selected) */}
+              {selectedSheetObj &&
+                (!selectedSheetObj.hasSubRole || selectedSubRoleObj) && (
+                  <SearchableDropdown
+                    stepNumber={selectedSheetObj.hasSubRole ? '3' : '2'}
+                    stepLabel={
+                      selectedSheetObj.hasSubRole
+                        ? 'Select Your Name'
+                        : selectedSheetObj.key === 'BM'
+                        ? 'Select Your Branch'
+                        : 'Select Your Name'
+                    }
+                    placeholder={
+                      selectedSheetObj.key === 'BM'
+                        ? 'Select Branch...'
+                        : 'Select Name...'
+                    }
+                    searchPlaceholder={
+                      selectedSheetObj.key === 'BM'
+                        ? 'Search branch name...'
+                        : 'Search name...'
+                    }
+                    options={itemDropdownOptions}
+                    selectedValue={activeLeadership.itemId}
+                    onSelect={handleSelectLeadershipItem}
+                    isOpen={openDropdown === 'item'}
+                    onToggle={() =>
+                      setOpenDropdown((prev) => (prev === 'item' ? null : 'item'))
+                    }
+                    onClose={() => setOpenDropdown(null)}
+                  />
+                )}
+            </div>
+          )}
         </div>
 
         {/* ============================================================== */}

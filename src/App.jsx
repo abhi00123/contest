@@ -12,6 +12,11 @@ export default function App() {
   const [userRole, setUserRole] = useState(null); // 'frontline' or 'leadership'
   const [selectedLane, setSelectedLane] = useState(2); // BBRL Staff Urban & Metro
   const [wap, setWap] = useState(0);
+  const [leadershipSelection, setLeadershipSelection] = useState({
+    sheetKey: '',
+    subRoleKey: '',
+    itemId: ''
+  });
 
   // Smooth Video Transition States
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
@@ -261,6 +266,8 @@ export default function App() {
               wap={wap}
               setWap={setWap}
               userRole={userRole}
+              leadershipSelection={leadershipSelection}
+              onUpdateLeadership={setLeadershipSelection}
               onNavigate={() => handleNavigate('rules')}
             />
           )}
