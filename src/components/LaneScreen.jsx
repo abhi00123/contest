@@ -39,11 +39,6 @@ function SearchableDropdown({
   useEffect(() => {
     if (isOpen) {
       setSearchTerm('');
-      setTimeout(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
-        }
-      }, 30);
     }
   }, [isOpen]);
 
