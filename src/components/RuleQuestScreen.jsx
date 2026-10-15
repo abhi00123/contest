@@ -423,51 +423,36 @@ export default function RuleQuestScreen({ onNavigate }) {
                   overflow: 'visible'
                 }}
               >
-                {/* Left Column: Verdict Title + Answer + Rule Explanation */}
+                {/* Left Column: Clean Answer (only if wrong) + Rule Explanation */}
                 <div style={{
                   flex: 1,
                   minWidth: 0,
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 'clamp(3px, 0.5vh, 5px)',
+                  gap: 'clamp(4px, 0.6vh, 6px)',
                   textAlign: 'left'
                 }}>
-                  {/* Status Tag */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <span style={{ fontSize: 'clamp(12px, 1.6vh, 14px)' }}>
-                      {isCurrentCorrect ? '🎉' : '⚠️'}
-                    </span>
-                    <span style={{
-                      fontFamily: "'Outfit', sans-serif",
-                      fontSize: 'clamp(11px, 1.45vh, 13px)',
-                      fontWeight: 900,
-                      letterSpacing: '0.04em',
-                      textTransform: 'uppercase',
-                      color: isCurrentCorrect ? '#15803D' : '#B91C1C'
+                  {/* Clean Correct Answer Line (Only shown when user selects wrong answer) */}
+                  {!isCurrentCorrect && (
+                    <div style={{
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      fontSize: 'clamp(12px, 1.6vh, 14px)',
+                      fontWeight: 800,
+                      color: '#0F172A',
+                      lineHeight: 1.3
                     }}>
-                      {isCurrentCorrect ? 'Official Stamp Collected!' : 'Rule Misaligned · Recheck!'}
-                    </span>
-                  </div>
-
-                  {/* Clean Correct Answer Line */}
-                  <div style={{
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    fontSize: 'clamp(11.5px, 1.5vh, 13px)',
-                    fontWeight: 800,
-                    color: '#0F172A',
-                    lineHeight: 1.3
-                  }}>
-                    <span style={{ color: isCurrentCorrect ? '#15803D' : '#B91C1C', fontWeight: 900 }}>Answer: </span>
-                    {currentCard.answerText}
-                  </div>
+                      <span style={{ color: '#B91C1C', fontWeight: 900 }}>Answer: </span>
+                      {currentCard.answerText}
+                    </div>
+                  )}
 
                   {/* Detailed Rule Insight */}
                   <p style={{
                     margin: 0,
                     fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    fontSize: 'clamp(11px, 1.45vh, 12.5px)',
+                    fontSize: 'clamp(11.5px, 1.5vh, 13px)',
                     fontWeight: 600,
-                    lineHeight: 1.38,
+                    lineHeight: 1.4,
                     color: '#1E293B'
                   }}>
                     {currentCard.why}
