@@ -24,13 +24,22 @@ export default function RuleQuestScreen({ onNavigate }) {
   const currentCard = cards[Math.min(idx, cards.length - 1)];
   const score = results.filter(Boolean).length;
 
-  const handleNext = () => {
-    if (userSelectedOption === null) return;
-    const isCorrect = userSelectedOption === currentCard.correct;
+  const isAnswered = userSelectedOption !== null;
+  const isCurrentCorrect = isAnswered && userSelectedOption === currentCard.correct;
+
+  const handleSelectOption = (optIdx) => {
+    if (userSelectedOption !== null) return; // Lock in selection once answered
+    setUserSelectedOption(optIdx);
+    const isCorrect = optIdx === currentCard.correct;
+    sound.play('stamp');
 
     const nextResults = [...results];
     nextResults[idx] = isCorrect;
     setResults(nextResults);
+  };
+
+  const handleNext = () => {
+    if (userSelectedOption === null) return;
 
     if (idx < cards.length - 1) {
       sound.play('click');
@@ -38,7 +47,7 @@ export default function RuleQuestScreen({ onNavigate }) {
       setUserSelectedOption(null);
       setCardKey(prev => prev + 1);
     } else {
-      sound.play('stamp');
+      sound.play('fanfare');
       setIdx(cards.length);
     }
   };
@@ -69,7 +78,7 @@ export default function RuleQuestScreen({ onNavigate }) {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        padding: 'clamp(14px, 2.4vh, 26px) clamp(12px, 3vw, 18px)',
+        padding: 'clamp(12px, 2vh, 22px) clamp(12px, 3vw, 18px)',
         overflow: 'hidden',
         userSelect: 'none'
       }}
@@ -94,13 +103,13 @@ export default function RuleQuestScreen({ onNavigate }) {
       {/* 1. TOP HEADER: TITLE + QUESTION COUNTER + PROGRESS BARS */}
       {/* ============================================================== */}
       {!done && (
-        <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', gap: 'clamp(6px, 1vh, 10px)' }}>
+        <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', gap: 'clamp(5px, 0.9vh, 9px)', flexShrink: 0 }}>
           {/* Top Row: Title & Question Counter */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <h1 style={{
               margin: 0,
               fontFamily: "'Outfit', 'Plus Jakarta Sans', sans-serif",
-              fontSize: 'clamp(22px, 3vh, 28px)',
+              fontSize: 'clamp(21px, 2.9vh, 27px)',
               fontWeight: 900,
               color: '#FFFFFF',
               lineHeight: 1.15,
@@ -118,7 +127,7 @@ export default function RuleQuestScreen({ onNavigate }) {
             }}>
               <span style={{
                 fontFamily: "'Outfit', sans-serif",
-                fontSize: 'clamp(24px, 3.4vh, 30px)',
+                fontSize: 'clamp(23px, 3.2vh, 29px)',
                 fontWeight: 900,
                 color: '#F5B838',
                 lineHeight: 1,
@@ -128,7 +137,7 @@ export default function RuleQuestScreen({ onNavigate }) {
               </span>
               <span style={{
                 fontFamily: "'Outfit', sans-serif",
-                fontSize: 'clamp(15px, 2.1vh, 18px)',
+                fontSize: 'clamp(14px, 2vh, 17px)',
                 fontWeight: 800,
                 color: '#94A3B8',
                 lineHeight: 1
@@ -141,16 +150,20 @@ export default function RuleQuestScreen({ onNavigate }) {
           {/* 6 Clean Segmented Progress Indicator Bars */}
           <div style={{ display: 'flex', gap: 6, width: '100%', marginTop: 2 }}>
             {cards.map((_, i) => {
-              const isAnswered = i < idx;
+              const r = results[i];
               const isCurrent = i === idx;
               let bg = 'rgba(255, 255, 255, 0.12)';
               let border = 'rgba(255, 255, 255, 0.18)';
               let glow = 'none';
 
-              if (isAnswered) {
-                bg = 'linear-gradient(135deg, #FFE28A 0%, #F5B838 100%)';
-                border = '#F5B838';
-                glow = '0 0 8px rgba(245, 184, 56, 0.6)';
+              if (r === true) {
+                bg = 'linear-gradient(135deg, #34D399 0%, #10B981 100%)';
+                border = '#34D399';
+                glow = '0 0 8px rgba(16, 185, 129, 0.7)';
+              } else if (r === false) {
+                bg = 'linear-gradient(135deg, #F87171 0%, #EF4444 100%)';
+                border = '#F87171';
+                glow = '0 0 8px rgba(239, 68, 68, 0.7)';
               } else if (isCurrent) {
                 bg = 'linear-gradient(135deg, #FFFFFF 0%, #FFE28A 100%)';
                 border = '#FFFFFF';
@@ -177,7 +190,7 @@ export default function RuleQuestScreen({ onNavigate }) {
       )}
 
       {/* ============================================================== */}
-      {/* 2. CENTER QUESTION CARD (Direct Question + Options Selection) */}
+      {/* 2. CENTER QUESTION CARD (Question + Options + Stamp & Answer) */}
       {/* ============================================================== */}
       {!done && (
         <div style={{
@@ -187,23 +200,34 @@ export default function RuleQuestScreen({ onNavigate }) {
           justifyContent: 'center',
           width: '100%',
           zIndex: 2,
-          padding: 'clamp(6px, 1vh, 14px) 0'
+          padding: 'clamp(4px, 0.8vh, 10px) 0',
+          minHeight: 0
         }}>
           <div
             key={cardKey}
+            className={isAnswered ? 'card-stamp-recoil' : ''}
             style={{
               position: 'relative',
               width: '100%',
               borderRadius: 'clamp(18px, 2.4vh, 24px)',
-              background: 'rgba(255, 255, 255, 0.96)',
+              background: 'linear-gradient(165deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.96) 100%)',
               backdropFilter: 'blur(20px)',
-              border: '1.5px solid rgba(255, 255, 255, 0.95)',
-              padding: 'clamp(18px, 2.6vh, 26px) clamp(14px, 2.8vw, 20px)',
+              border: !isAnswered
+                ? '1.5px solid rgba(255, 255, 255, 0.95)'
+                : (isCurrentCorrect ? '2.5px solid #10B981' : '2.5px solid #EF4444'),
+              padding: isAnswered
+                ? 'clamp(13px, 1.9vh, 20px) clamp(13px, 2.6vw, 18px)'
+                : 'clamp(18px, 2.6vh, 26px) clamp(14px, 2.8vw, 20px)',
               boxSizing: 'border-box',
               display: 'flex',
               flexDirection: 'column',
-              boxShadow: '0 16px 45px rgba(0, 0, 0, 0.5), 0 0 25px rgba(233, 185, 73, 0.12)',
-              animation: 'screenFadeIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              boxShadow: !isAnswered
+                ? '0 16px 45px rgba(0, 0, 0, 0.5), 0 0 25px rgba(233, 185, 73, 0.12)'
+                : (isCurrentCorrect
+                    ? '0 18px 45px rgba(0, 0, 0, 0.55), 0 0 28px rgba(16, 185, 129, 0.35)'
+                    : '0 18px 45px rgba(0, 0, 0, 0.55), 0 0 28px rgba(239, 68, 68, 0.35)'),
+              animation: !isAnswered ? 'screenFadeIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards' : undefined,
+              transition: 'border-color 0.25s ease, box-shadow 0.25s ease, padding 0.2s ease',
               overflow: 'hidden'
             }}
           >
@@ -211,11 +235,12 @@ export default function RuleQuestScreen({ onNavigate }) {
             <h2 style={{
               margin: 0,
               fontFamily: "'Plus Jakarta Sans', sans-serif",
-              fontSize: 'clamp(16px, 2.2vh, 20px)',
+              fontSize: isAnswered ? 'clamp(14.5px, 1.95vh, 18px)' : 'clamp(16px, 2.2vh, 20px)',
               fontWeight: 800,
-              lineHeight: 1.4,
+              lineHeight: 1.35,
               color: '#0F172A',
-              letterSpacing: '-0.01em'
+              letterSpacing: '-0.01em',
+              transition: 'font-size 0.2s ease'
             }}>
               {currentCard.q}
             </h2>
@@ -224,22 +249,63 @@ export default function RuleQuestScreen({ onNavigate }) {
             <div style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: 'clamp(7px, 1.1vh, 10px)',
-              marginTop: 'clamp(14px, 2.2vh, 22px)',
+              gap: isAnswered ? 'clamp(5px, 0.8vh, 8px)' : 'clamp(7px, 1.1vh, 10px)',
+              marginTop: isAnswered ? 'clamp(10px, 1.4vh, 15px)' : 'clamp(14px, 2.2vh, 22px)',
               width: '100%',
-              zIndex: 2
+              zIndex: 2,
+              transition: 'all 0.2s ease'
             }}>
               {currentCard.options.map((optionText, optIdx) => {
                 const optionLetters = ['A', 'B', 'C', 'D'];
                 const isSelected = userSelectedOption === optIdx;
+                const isCorrectOption = optIdx === currentCard.correct;
+
+                // Visual state calculations
+                let optionBorder = '1.5px solid #CBD5E1';
+                let optionBg = 'linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%)';
+                let optionColor = '#0F172A';
+                let optionShadow = '0 2px 6px rgba(15, 23, 42, 0.05)';
+                let optionOpacity = 1;
+                let badgeBg = 'linear-gradient(135deg, #0B1536 0%, #15244E 100%)';
+                let badgeColor = '#FFE28A';
+                let badgeBorder = '1px solid rgba(233, 185, 73, 0.4)';
+
+                if (isAnswered) {
+                  if (isCorrectOption) {
+                    optionBorder = '2px solid #10B981';
+                    optionBg = 'linear-gradient(135deg, #064E3B 0%, #047857 100%)';
+                    optionColor = '#FFFFFF';
+                    optionShadow = '0 4px 14px rgba(16, 185, 129, 0.3)';
+                    badgeBg = 'linear-gradient(135deg, #A7F3D0 0%, #34D399 100%)';
+                    badgeColor = '#064E3B';
+                    badgeBorder = 'none';
+                  } else if (isSelected && !isCorrectOption) {
+                    optionBorder = '2px solid #EF4444';
+                    optionBg = 'linear-gradient(135deg, #7F1D1D 0%, #B91C1C 100%)';
+                    optionColor = '#FFFFFF';
+                    optionShadow = '0 4px 14px rgba(239, 68, 68, 0.3)';
+                    badgeBg = 'linear-gradient(135deg, #FECACA 0%, #F87171 100%)';
+                    badgeColor = '#7F1D1D';
+                    badgeBorder = 'none';
+                  } else {
+                    optionOpacity = 0.52;
+                    optionBorder = '1px solid #E2E8F0';
+                    optionBg = '#F8FAFC';
+                  }
+                } else if (isSelected) {
+                  optionBorder = '2px solid #E9B949';
+                  optionBg = 'linear-gradient(135deg, #0B1536 0%, #15244E 100%)';
+                  optionColor = '#FFFFFF';
+                  optionShadow = '0 0 16px rgba(233, 185, 73, 0.4), 0 4px 12px rgba(0,0,0,0.25)';
+                  badgeBg = 'linear-gradient(135deg, #FFE28A 0%, #F5B838 100%)';
+                  badgeColor = '#0B1536';
+                  badgeBorder = 'none';
+                }
 
                 return (
                   <div
                     key={optIdx}
-                    onClick={() => {
-                      sound.play('click');
-                      setUserSelectedOption(optIdx);
-                    }}
+                    onClick={() => handleSelectOption(optIdx)}
                     role="button"
                     tabIndex={0}
                     style={{
@@ -247,72 +313,82 @@ export default function RuleQuestScreen({ onNavigate }) {
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       gap: 'clamp(8px, 1.5vw, 12px)',
-                      minHeight: 'clamp(44px, 5.8vh, 52px)',
-                      padding: 'clamp(7px, 1.1vh, 11px) clamp(12px, 2.2vw, 16px)',
-                      borderRadius: 'clamp(11px, 1.5vh, 14px)',
-                      border: isSelected ? '2px solid #E9B949' : '1.5px solid #CBD5E1',
-                      background: isSelected
-                        ? 'linear-gradient(135deg, #0B1536 0%, #15244E 100%)'
-                        : 'linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%)',
-                      color: isSelected ? '#FFFFFF' : '#0F172A',
-                      cursor: 'pointer',
-                      transition: 'all 0.16s cubic-bezier(0.16, 1, 0.3, 1)',
-                      boxShadow: isSelected
-                        ? '0 0 16px rgba(233, 185, 73, 0.4), 0 4px 12px rgba(0,0,0,0.25)'
-                        : '0 2px 6px rgba(15, 23, 42, 0.05)',
+                      minHeight: isAnswered ? 'clamp(36px, 4.7vh, 44px)' : 'clamp(44px, 5.8vh, 52px)',
+                      padding: isAnswered
+                        ? 'clamp(5px, 0.8vh, 8px) clamp(10px, 2vw, 14px)'
+                        : 'clamp(7px, 1.1vh, 11px) clamp(12px, 2.2vw, 16px)',
+                      borderRadius: 'clamp(10px, 1.4vh, 14px)',
+                      border: optionBorder,
+                      background: optionBg,
+                      color: optionColor,
+                      opacity: optionOpacity,
+                      cursor: isAnswered ? 'default' : 'pointer',
+                      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                      boxShadow: optionShadow,
                       userSelect: 'none'
                     }}
-                    onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.98)'; }}
-                    onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
-                    onTouchStart={(e) => { e.currentTarget.style.transform = 'scale(0.98)'; }}
-                    onTouchEnd={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                    onMouseDown={(e) => { if (!isAnswered) e.currentTarget.style.transform = 'scale(0.98)'; }}
+                    onMouseUp={(e) => { if (!isAnswered) e.currentTarget.style.transform = 'scale(1)'; }}
+                    onTouchStart={(e) => { if (!isAnswered) e.currentTarget.style.transform = 'scale(0.98)'; }}
+                    onTouchEnd={(e) => { if (!isAnswered) e.currentTarget.style.transform = 'scale(1)'; }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 1.5vw, 12px)', minWidth: 0 }}>
                       {/* Option Letter Badge: A, B, C, D */}
                       <div style={{
-                        width: 'clamp(24px, 3.2vh, 28px)',
-                        height: 'clamp(24px, 3.2vh, 28px)',
+                        width: isAnswered ? 'clamp(22px, 2.8vh, 25px)' : 'clamp(24px, 3.2vh, 28px)',
+                        height: isAnswered ? 'clamp(22px, 2.8vh, 25px)' : 'clamp(24px, 3.2vh, 28px)',
                         borderRadius: '50%',
-                        background: isSelected
-                          ? 'linear-gradient(135deg, #FFE28A 0%, #F5B838 100%)'
-                          : 'linear-gradient(135deg, #0B1536 0%, #15244E 100%)',
-                        color: isSelected ? '#0B1536' : '#FFE28A',
-                        border: isSelected ? 'none' : '1px solid rgba(233, 185, 73, 0.4)',
+                        background: badgeBg,
+                        color: badgeColor,
+                        border: badgeBorder,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         fontFamily: "'Outfit', sans-serif",
-                        fontSize: 'clamp(11.5px, 1.5vh, 13px)',
+                        fontSize: 'clamp(11px, 1.4vh, 12.5px)',
                         fontWeight: 900,
                         flexShrink: 0,
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.18)'
                       }}>
                         {optionLetters[optIdx]}
                       </div>
                       {/* Option Text */}
                       <span style={{
                         fontFamily: "'Plus Jakarta Sans', sans-serif",
-                        fontSize: 'clamp(14px, 1.85vh, 16.5px)',
-                        fontWeight: 900,
-                        lineHeight: 1.3
+                        fontSize: isAnswered ? 'clamp(13px, 1.7vh, 15.5px)' : 'clamp(14px, 1.85vh, 16.5px)',
+                        fontWeight: 800,
+                        lineHeight: 1.25
                       }}>
                         {optionText}
                       </span>
                     </div>
 
-                    {/* Radio Indicator Pill */}
+                    {/* Right Status Indicator Pill */}
                     <div style={{
-                      width: 18,
-                      height: 18,
-                      borderRadius: 9,
-                      border: isSelected ? '2px solid #F5B838' : '1.5px solid #CBD5E1',
-                      background: isSelected ? '#F5B838' : 'transparent',
+                      width: 20,
+                      height: 20,
+                      borderRadius: '50%',
+                      border: isAnswered
+                        ? (isCorrectOption
+                            ? '1.5px solid #A7F3D0'
+                            : (isSelected ? '1.5px solid #FECACA' : '1.5px solid #CBD5E1'))
+                        : (isSelected ? '2px solid #F5B838' : '1.5px solid #CBD5E1'),
+                      background: isAnswered
+                        ? (isCorrectOption
+                            ? '#10B981'
+                            : (isSelected ? '#EF4444' : 'transparent'))
+                        : (isSelected ? '#F5B838' : 'transparent'),
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      flexShrink: 0
+                      flexShrink: 0,
+                      color: '#FFFFFF',
+                      fontSize: '11px',
+                      fontWeight: 900
                     }}>
-                      {isSelected && (
+                      {isAnswered && isCorrectOption && '✓'}
+                      {isAnswered && isSelected && !isCorrectOption && '✕'}
+                      {!isAnswered && isSelected && (
                         <div style={{ width: 6, height: 6, borderRadius: 3, background: '#0B1536' }} />
                       )}
                     </div>
@@ -320,6 +396,175 @@ export default function RuleQuestScreen({ onNavigate }) {
                 );
               })}
             </div>
+
+            {/* ============================================================== */}
+            {/* SIMPLE, SLEEK STAMP + CORRECT ANSWER & EXPLANATION VERDICT PANEL */}
+            {/* ============================================================== */}
+            {isAnswered && (
+              <div
+                className="verdict-panel-animate"
+                style={{
+                  position: 'relative',
+                  marginTop: 'clamp(10px, 1.4vh, 14px)',
+                  borderRadius: 'clamp(12px, 1.6vh, 16px)',
+                  background: isCurrentCorrect
+                    ? 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)'
+                    : 'linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%)',
+                  border: `1.5px solid ${isCurrentCorrect ? '#22C55E' : '#EF4444'}`,
+                  padding: 'clamp(10px, 1.4vh, 14px) clamp(11px, 2.2vw, 15px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 'clamp(8px, 2vw, 12px)',
+                  boxShadow: isCurrentCorrect
+                    ? '0 6px 18px rgba(34, 197, 94, 0.16)'
+                    : '0 6px 18px rgba(239, 68, 68, 0.16)',
+                  zIndex: 5,
+                  overflow: 'visible'
+                }}
+              >
+                {/* Left Column: Verdict Title + Answer + Rule Explanation */}
+                <div style={{
+                  flex: 1,
+                  minWidth: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 'clamp(3px, 0.5vh, 5px)',
+                  textAlign: 'left'
+                }}>
+                  {/* Status Tag */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <span style={{ fontSize: 'clamp(12px, 1.6vh, 14px)' }}>
+                      {isCurrentCorrect ? '🎉' : '⚠️'}
+                    </span>
+                    <span style={{
+                      fontFamily: "'Outfit', sans-serif",
+                      fontSize: 'clamp(11px, 1.45vh, 13px)',
+                      fontWeight: 900,
+                      letterSpacing: '0.04em',
+                      textTransform: 'uppercase',
+                      color: isCurrentCorrect ? '#15803D' : '#B91C1C'
+                    }}>
+                      {isCurrentCorrect ? 'Official Stamp Collected!' : 'Rule Misaligned · Recheck!'}
+                    </span>
+                  </div>
+
+                  {/* Clean Correct Answer Line */}
+                  <div style={{
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontSize: 'clamp(11.5px, 1.5vh, 13px)',
+                    fontWeight: 800,
+                    color: '#0F172A',
+                    lineHeight: 1.3
+                  }}>
+                    <span style={{ color: isCurrentCorrect ? '#15803D' : '#B91C1C', fontWeight: 900 }}>Answer: </span>
+                    {currentCard.answerText}
+                  </div>
+
+                  {/* Detailed Rule Insight */}
+                  <p style={{
+                    margin: 0,
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontSize: 'clamp(11px, 1.45vh, 12.5px)',
+                    fontWeight: 600,
+                    lineHeight: 1.38,
+                    color: '#1E293B'
+                  }}>
+                    {currentCard.why}
+                  </p>
+                </div>
+
+                {/* Right Column: Simple, Sleek Circular Stamp with Dual Shockwave Animation */}
+                <div
+                  className="stamp-slam-container"
+                  style={{
+                    position: 'relative',
+                    width: 'clamp(80px, 11vh, 96px)',
+                    height: 'clamp(80px, 11vh, 96px)',
+                    flexShrink: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    pointerEvents: 'none',
+                    zIndex: 10
+                  }}
+                >
+                  {/* Primary Expanding Shockwave Ring on Impact */}
+                  <div
+                    className="stamp-shockwave"
+                    style={{
+                      position: 'absolute',
+                      inset: -4,
+                      borderRadius: '50%',
+                      border: `2px solid ${isCurrentCorrect ? '#22C55E' : '#EF4444'}`,
+                      pointerEvents: 'none'
+                    }}
+                  />
+                  {/* Secondary Delayed Shockwave Ripple */}
+                  <div
+                    className="stamp-shockwave-delayed"
+                    style={{
+                      position: 'absolute',
+                      inset: -8,
+                      borderRadius: '50%',
+                      border: `1.5px solid ${isCurrentCorrect ? 'rgba(34, 197, 94, 0.5)' : 'rgba(239, 68, 68, 0.5)'}`,
+                      pointerEvents: 'none'
+                    }}
+                  />
+
+                  {/* Clean, Simple & Crisp Circular Vector Stamp */}
+                  <svg
+                    viewBox="0 0 140 140"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      filter: `drop-shadow(0 6px 16px ${isCurrentCorrect ? 'rgba(22, 163, 74, 0.32)' : 'rgba(220, 38, 38, 0.35)'})`,
+                      shapeRendering: 'geometricPrecision',
+                      textRendering: 'geometricPrecision',
+                      overflow: 'visible'
+                    }}
+                  >
+                    {/* Clean Outer Stamp Circle */}
+                    <circle
+                      cx="70"
+                      cy="70"
+                      r="64"
+                      fill="rgba(255, 255, 255, 0.98)"
+                      stroke={isCurrentCorrect ? '#16A34A' : '#DC2626'}
+                      strokeWidth="4"
+                    />
+
+                    {/* Simple Inner Dashed Security Ring */}
+                    <circle
+                      cx="70"
+                      cy="70"
+                      r="54"
+                      fill="none"
+                      stroke={isCurrentCorrect ? '#16A34A' : '#DC2626'}
+                      strokeWidth="1.6"
+                      strokeDasharray="5 3.5"
+                    />
+
+                    {/* Main Bold Stamped Word - Clean & Perfectly Centered */}
+                    <text
+                      x="70"
+                      y="70"
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      fill={isCurrentCorrect ? '#15803D' : '#DC2626'}
+                      style={{
+                        fontFamily: "'Outfit', sans-serif",
+                        fontSize: '19.5px',
+                        fontWeight: 950,
+                        letterSpacing: '0.04em'
+                      }}
+                    >
+                      {isCurrentCorrect ? 'APPROVED' : 'RECHECK'}
+                    </text>
+                  </svg>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -328,7 +573,7 @@ export default function RuleQuestScreen({ onNavigate }) {
       {/* 3. BOTTOM ACTION BUTTON (Only shows when an option is selected) */}
       {/* ============================================================== */}
       {!done && (
-        <div style={{ position: 'relative', zIndex: 10, width: '100%', minHeight: 'clamp(54px, 7vh, 68px)', display: 'flex', alignItems: 'center' }}>
+        <div style={{ position: 'relative', zIndex: 10, width: '100%', minHeight: 'clamp(50px, 6.6vh, 64px)', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
           {userSelectedOption !== null && (
             <button
               type="button"
@@ -336,13 +581,13 @@ export default function RuleQuestScreen({ onNavigate }) {
               style={{
                 position: 'relative',
                 width: '100%',
-                height: 'clamp(54px, 7vh, 68px)',
+                height: 'clamp(50px, 6.6vh, 64px)',
                 borderRadius: 'clamp(14px, 2vh, 20px)',
                 border: '1.5px solid #FFF0B8',
                 background: 'linear-gradient(135deg, #FFE28A 0%, #F5B838 50%, #E29B12 100%)',
                 color: '#1A1202',
                 fontFamily: "'Outfit', 'Plus Jakarta Sans', sans-serif",
-                fontSize: 'clamp(19.5px, 2.7vh, 23.5px)',
+                fontSize: 'clamp(18.5px, 2.5vh, 22.5px)',
                 fontWeight: 900,
                 WebkitTextStroke: '0.6px #1A1202',
                 letterSpacing: '0.04em',
@@ -372,7 +617,7 @@ export default function RuleQuestScreen({ onNavigate }) {
                 animation: 'goldBtnShine 3s infinite'
               }} />
 
-              <span style={{ whiteSpace: 'nowrap', WebkitTextStroke: '0.6px #1A1202' }}>{idx === cards.length - 1 ? 'SUBMIT' : 'NEXT'}</span>
+              <span style={{ whiteSpace: 'nowrap', WebkitTextStroke: '0.6px #1A1202' }}>{idx === cards.length - 1 ? 'VIEW RESULTS' : 'NEXT'}</span>
               <svg
                 style={{ width: 'clamp(20px, 2.6vh, 25px)', height: 'clamp(20px, 2.6vh, 25px)', flexShrink: 0 }}
                 viewBox="0 0 24 24"
