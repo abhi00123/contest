@@ -464,8 +464,8 @@ export default function RuleQuestScreen({ onNavigate }) {
                   className="stamp-slam-container"
                   style={{
                     position: 'relative',
-                    width: 'clamp(80px, 11vh, 96px)',
-                    height: 'clamp(80px, 11vh, 96px)',
+                    width: 'clamp(92px, 12.6vh, 110px)',
+                    height: 'clamp(92px, 12.6vh, 110px)',
                     flexShrink: 0,
                     display: 'flex',
                     alignItems: 'center',
@@ -513,24 +513,24 @@ export default function RuleQuestScreen({ onNavigate }) {
                     <circle
                       cx="70"
                       cy="70"
-                      r="64"
+                      r="66"
                       fill="rgba(255, 255, 255, 0.98)"
                       stroke={isCurrentCorrect ? '#16A34A' : '#DC2626'}
                       strokeWidth="4"
                     />
 
-                    {/* Simple Inner Dashed Security Ring */}
+                    {/* Wider Inner Dashed Security Ring for Generous Text Clearance */}
                     <circle
                       cx="70"
                       cy="70"
-                      r="54"
+                      r="58"
                       fill="none"
                       stroke={isCurrentCorrect ? '#16A34A' : '#DC2626'}
                       strokeWidth="1.6"
                       strokeDasharray="5 3.5"
                     />
 
-                    {/* Main Bold Stamped Word - Clean & Perfectly Centered */}
+                    {/* Main Bold Stamped Word - Clean & Perfectly Centered Inside Dotted Ring */}
                     <text
                       x="70"
                       y="70"
@@ -539,9 +539,9 @@ export default function RuleQuestScreen({ onNavigate }) {
                       fill={isCurrentCorrect ? '#15803D' : '#DC2626'}
                       style={{
                         fontFamily: "'Outfit', sans-serif",
-                        fontSize: '19.5px',
+                        fontSize: isCurrentCorrect ? '16px' : '17px',
                         fontWeight: 950,
-                        letterSpacing: '0.04em'
+                        letterSpacing: '0.03em'
                       }}
                     >
                       {isCurrentCorrect ? 'APPROVED' : 'RECHECK'}
